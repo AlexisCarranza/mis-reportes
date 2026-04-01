@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OKR & Project Status — Q1 2026 Executive Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --white: #ffffff;
+    --ink: #0f0f0f;
+    --ink2: #2a2a2a;
+    --muted: #8a8a8a;
+    --border: #e2ddd6;
+    --accent: #c8502a;
+    --accent2: #1a3a5c;
+    --green: #2d6a4f;
+    --yellow: #b5820a;
+    --red: #c0392b;
+    --blue: #1a3a5c;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  /* PAGE LAYOUT */
+  .page {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 64px 48px 96px;
+  }
+
+  /* ── COVER SECTION ── */
+  .cover {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    min-height: 260px;
+    margin-bottom: 72px;
+    animation: fadeIn 0.8s ease both;
+  }
+
+  .cover-left {
+    border-right: 1px solid var(--ink);
+    padding-right: 48px;
+  }
+
+  .cover-eyebrow {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cover-eyebrow::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .cover-title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5vw, 58px);
+    font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 20px;
+  }
+
+  .cover-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .cover-sub {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    margin-top: 16px;
+  }
+
+  .cover-right {
+    padding-left: 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .cover-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .meta-item {}
+
+  .meta-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+
+  .meta-value {
+    font-size: 14px;
+    color: var(--ink2);
+    font-weight: 400;
+  }
+
+  .cover-score {
+    text-align: right;
+  }
+
+  .score-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .score-value {
+    font-family: var(--font-display);
+    font-size: 72px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--green);
+    letter-spacing: -0.03em;
+  }
+
+  .score-max {
+    font-size: 20px;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-weight: 300;
+  }
+
+  .score-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ── SECTION HEADING ── */
+  .sec-heading {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+
+  .sec-num {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .sec-line { height: 1px; background: var(--ink); }
+
+  .sec-title {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── SUMMARY STRIP ── */
+  .summary-strip {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border: 1px solid var(--ink);
+    margin-bottom: 64px;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+
+  .sum-item {
+    padding: 24px 20px;
+    border-right: 1px solid var(--ink);
+    text-align: center;
+  }
+
+  .sum-item:last-child { border-right: none; }
+
+  .sum-val {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .sum-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .val-green { color: var(--green); }
+  .val-yellow { color: var(--yellow); }
+  .val-red { color: var(--red); }
+  .val-blue { color: var(--blue); }
+  .val-ink { color: var(--ink); }
+
+  /* ── OKR SECTION ── */
+  .okr-section {
+    margin-bottom: 64px;
+    animation: fadeUp 0.6s ease 0.15s both;
+  }
+
+  .okr-block {
+    margin-bottom: 40px;
+    background: var(--white);
+    border: 1px solid var(--border);
+  }
+
+  .okr-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    gap: 20px;
+  }
+
+  .okr-objective {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  .okr-score-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .okr-pct {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .okr-pct-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .kr-list {
+    padding: 20px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .kr-item {
+    display: grid;
+    grid-template-columns: 1fr 80px 140px;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .kr-text {
+    font-size: 13px;
+    color: var(--ink2);
+  }
+
+  .kr-text strong {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 2px;
+    font-size: 13px;
+  }
+
+  .kr-text span {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .kr-val {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    text-align: right;
+  }
+
+  .kr-bar-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .kr-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .kr-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1.2s cubic-bezier(0.16,1,0.3,1);
+    width: 0;
+  }
+
+  .kr-range {
+    font-size: 10px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ── PROJECTS TABLE ── */
+  .projects-section {
+    margin-bottom: 64px;
+    animation: fadeUp 0.6s ease 0.25s both;
+  }
+
+  .proj-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    border: 1px solid var(--border);
+  }
+
+  .proj-table thead th {
+    padding: 14px 20px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--ink);
+    background: var(--bg);
+  }
+
+  .proj-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  .proj-table tbody tr:last-child { border-bottom: none; }
+  .proj-table tbody tr:hover { background: var(--bg); }
+
+  .proj-table tbody td {
+    padding: 16px 20px;
+    font-size: 13px;
+    vertical-align: middle;
+  }
+
+  .proj-name {
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 13px;
+    display: block;
+  }
+
+  .proj-desc {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+    display: block;
+  }
+
+  .status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 2px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .chip-on-track { background: #edf7f1; color: var(--green); border: 1px solid #b7dfc9; }
+  .chip-at-risk { background: #fef9ec; color: var(--yellow); border: 1px solid #f0d48a; }
+  .chip-delayed { background: #fdf0ef; color: var(--red); border: 1px solid #f0b9b5; }
+  .chip-done { background: #eef2f7; color: var(--blue); border: 1px solid #b5c8df; }
+
+  .prog-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .prog-track {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    min-width: 60px;
+  }
+
+  .prog-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1.4s cubic-bezier(0.16,1,0.3,1);
+    width: 0;
+  }
+
+  .prog-pct {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink2);
+    min-width: 32px;
+    text-align: right;
+  }
+
+  /* ── BLOCKERS ── */
+  .blockers-section {
+    margin-bottom: 64px;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+
+  .blockers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .blocker-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    padding: 20px 24px;
+  }
+
+  .blocker-card.medium {
+    border-left-color: var(--yellow);
+  }
+
+  .blocker-tag {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .blocker-tag.high { color: var(--red); }
+  .blocker-tag.medium { color: var(--yellow); }
+
+  .blocker-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  .blocker-body {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .blocker-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 11px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+  }
+
+  .blocker-meta strong {
+    color: var(--ink2);
+    font-weight: 500;
+  }
+
+  /* ── TEAM SPOTLIGHT ── */
+  .team-section {
+    margin-bottom: 64px;
+    animation: fadeUp 0.6s ease 0.35s both;
+  }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .team-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    padding: 20px;
+    text-align: center;
+  }
+
+  .team-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--white);
+  }
+
+  .team-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  .team-role {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .team-contrib {
+    font-size: 11px;
+    color: var(--ink2);
+    background: var(--bg);
+    padding: 6px 10px;
+    border-radius: 2px;
+    line-height: 1.4;
+  }
+
+  /* ── OUTLOOK ── */
+  .outlook-section {
+    animation: fadeUp 0.6s ease 0.4s both;
+    margin-bottom: 64px;
+  }
+
+  .outlook-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--ink);
+  }
+
+  .outlook-col {
+    padding: 28px 24px;
+    border-right: 1px solid var(--ink);
+  }
+
+  .outlook-col:last-child { border-right: none; }
+
+  .outlook-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .outlook-label::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  .risks .outlook-label::before { background: var(--red); }
+  .actions .outlook-label::before { background: var(--blue); }
+  .wins .outlook-label::before { background: var(--green); }
+
+  .outlook-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .outlook-list li {
+    font-size: 12px;
+    color: var(--ink2);
+    padding-left: 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .outlook-list li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--muted);
+    font-size: 10px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    padding-top: 32px;
+    border-top: 1px solid var(--ink);
+    animation: fadeUp 0.6s ease 0.45s both;
+  }
+
+  .footer-left {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-style: italic;
+    color: var(--muted);
+  }
+
+  .footer-right {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media print {
+    body { background: white; }
+    .page { padding: 32px; }
+  }
+
+  @media (max-width: 768px) {
+    .cover { grid-template-columns: 1fr; }
+    .cover-left { border-right: none; border-bottom: 1px solid var(--ink); padding: 0 0 32px; }
+    .cover-right { padding: 32px 0 0; }
+    .summary-strip { grid-template-columns: repeat(3,1fr); }
+    .kr-item { grid-template-columns: 1fr; }
+    .blockers-grid { grid-template-columns: 1fr; }
+    .team-grid { grid-template-columns: repeat(2,1fr); }
+    .outlook-grid { grid-template-columns: 1fr; }
+    .outlook-col { border-right: none; border-bottom: 1px solid var(--ink); }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══ COVER ══ -->
+  <div class="cover">
+    <div class="cover-left">
+      <div class="cover-eyebrow">Executive Review</div>
+      <h1 class="cover-title">OKR &amp;<br><em>Project</em><br>Status</h1>
+      <div class="cover-sub">Q1 2026 · NAM DevOps &amp; SRE · Bogotá Regional Hub</div>
+    </div>
+    <div class="cover-right">
+      <div class="cover-meta">
+        <div class="meta-item">
+          <div class="meta-label">Period</div>
+          <div class="meta-value">January — March 2026</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Team</div>
+          <div class="meta-value">DevOps &amp; SRE Unit · 8 members</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Prepared by</div>
+          <div class="meta-value">Alexis Carranza · IT Leadership</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Audience</div>
+          <div class="meta-value">Senior Leadership &amp; Stakeholders</div>
+        </div>
+      </div>
+      <div class="cover-score">
+        <div class="score-label">Overall OKR Score</div>
+        <div class="score-value">78<span class="score-max">%</span></div>
+        <div class="score-sub">↑ +6pts vs Q4 2025</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SUMMARY ══ -->
+  <div class="sec-heading">
+    <span class="sec-num">01</span>
+    <div class="sec-line"></div>
+    <span class="sec-title">Quarter at a Glance</span>
+  </div>
+  <div class="summary-strip">
+    <div class="sum-item">
+      <div class="sum-val val-ink">4</div>
+      <div class="sum-label">Objectives</div>
+    </div>
+    <div class="sum-item">
+      <div class="sum-val val-ink">12</div>
+      <div class="sum-label">Key Results</div>
+    </div>
+    <div class="sum-item">
+      <div class="sum-val val-green">7</div>
+      <div class="sum-label">On Track</div>
+    </div>
+    <div class="sum-item">
+      <div class="sum-val val-yellow">3</div>
+      <div class="sum-label">At Risk</div>
+    </div>
+    <div class="sum-item">
+      <div class="sum-val val-red">2</div>
+      <div class="sum-label">Off Track</div>
+    </div>
+  </div>
+
+  <!-- ══ OKRs ══ -->
+  <div class="okr-section">
+    <div class="sec-heading">
+      <span class="sec-num">02</span>
+      <div class="sec-line"></div>
+      <span class="sec-title">Objectives &amp; Key Results</span>
+    </div>
+
+    <!-- OKR 1 -->
+    <div class="okr-block">
+      <div class="okr-header">
+        <div class="okr-objective">Achieve industry-leading eCommerce platform reliability across NAM</div>
+        <div class="okr-score-pill">
+          <div>
+            <div class="okr-pct val-green">88%</div>
+            <div class="okr-pct-label">Progress</div>
+          </div>
+        </div>
+      </div>
+      <div class="kr-list">
+        <div class="kr-item">
+          <div class="kr-text">
+            <strong>Maintain ≥99.9% availability across all critical services</strong>
+            <span>Current: 99.87% · Checkout at 99.92%</span>
+          </div>
+          <div class="kr-val val-yellow">99.87%</div>
+          <div class="kr-bar-wrap">
+            <div class="kr-track"><div class="kr-fill" data-w="99" style="background:var(--yellow)"></div></div>
+            <div class="kr-range"><span>0%</span><span>Target 99.9%</span></div>
+          </div>
+        </div>
+        <div class="kr-item">
+          <div class="kr-text">
+            <strong>Reduce MTTR to under 20 minutes for P1/P2 incidents</strong>
+            <span>Current: 23 min avg · P2 improved to 22 min</span>
+          </div>
+          <div class="kr-val val-yellow">23 min</div>
+          <div class="kr-bar-wrap">
+            <div class="kr-track"><div class="kr-fill" data-w="77" style="background:var(--yellow)"></div></div>
+            <div class="kr-range"><span>0</span><span>Target 20 min</span></div>
+          </div>
+        </div>
+        <div class="kr-item">
+          <div class="kr-text">
+            <strong>Achieve 100% runbook coverage for critical services</strong>
+            <span>Current: 94% · 3 runbooks pending Auth Service update</span>
+          </div>
+          <div class="kr-val val-green">94%</div>
+          <div class="kr-bar-wrap">
+            <div class="kr-track"><div class="kr-fill" data-w="94" style="background:var(--green)"></div></div>
+            <div class="kr-range"><span>0%</span><span>Target 100%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OKR 2 -->
+    <div class="okr-block">
+      <div class="okr-header">
+        <div class="okr-objective">Accelerate software delivery velocity without compromising quality</div>
+        <div class="okr-score-pill">
+          <div>
+            <div class="okr-pct val-green">82%</div>
+            <div class="okr-pct-label">Progress</div>
+          </div>
+        </div>
+      </div>
+      <div class="kr-list">
+        <div class="kr-item">
+          <div class="kr-text">
+            <strong>Increase deployment frequency to 2x per week per service</strong>
+            <span>Current: 1.7x/week · CI pipeline optimization in progress</span>
+          </div>
+          <div class="kr-val val-yellow">1.7×</div>
+          <div class="kr-bar-wrap">
+            <div class="kr-track"><div class="kr-fill" data-w="85" style="background:var(--yellow)"></div></div>
+            <div class="kr-range"><span>0</span><span>Target 2×/wk</span></div>
+          </div>
+        </div>
+        <div class="kr-item">
+          <div class="kr-text">
+            <strong>Reduce change failure rate below 5%</strong>
+            <span>Current: 3.8% · Automated regression suite expanded</span>
+          </div>
+          <div class="kr-val val-green">3.8%</div>
+          <div class="kr-bar-wrap">
+            <div class="kr-track"><div class="kr-fill" data-w="90" style="background:var(--green)"></div></div>
+            <div class="kr-range"><span>0%</span><span>Target &lt;5%</span></div>
+          </div>
+        </div>
+        <div class="kr-item">
+          <div class="kr-text">
+            <strong>Cut lead time from commit to production under 4 hours</strong>
+            <span>Current: 5.2h · Blocked by approval workflow redesign</span>
+          </div>
+          <div class="kr-val val-red">5.2 h</div>
+          <div class="kr-bar-wrap">
+            <div class="kr-track"><div class="kr-fill" data-w="55" style="background:var(--red)"></div></div>
+            <div class="kr-range"><span>0</span><span>Target 4h</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OKR 3 -->
+    <div class="okr-block">
+      <div class="okr-header">
+        <div class="okr-objective">Strengthen observability and proactive incident prevention</div>
+        <div class="okr-score-pill">
+          <div>
+            <div class="okr-pct val-green">75%</div>
+            <div class="okr-pct-label">Progress</div>
+          </div>
+        </div>
+      </div>
+      <div class="kr-list">
+        <div class="kr-item">
+          <div class="kr-text">
+            <strong>Instrument 100% of critical services with distributed tracing</strong>
+            <span>Current: 7/10 services · Inventory &amp; Auth pending</span>
+          </div>
+          <div class="kr-val val-yellow">70%</div>
+          <div class="kr-bar-wrap">
+            <div class="kr-track"><div class="kr-fill" data-w="70" style="background:var(--yellow)"></div></div>
+            <div class="kr-range"><span>0%</span><span>Target 100%</span></div>
+          </div>
+        </div>
+        <div class="kr-item">
+          <div class="kr-text">
+            <strong>Reduce MTTD (mean time to detect) to under 3 minutes</strong>
+            <span>Current: 4 min · New alerting rules deployed Mar 15</span>
+          </div>
+          <div class="kr-val val-yellow">4 min</div>
+          <div class="kr-bar-wrap">
+            <div class="kr-track"><div class="kr-fill" data-w="65" style="background:var(--yellow)"></div></div>
+            <div class="kr-range"><span>0</span><span>Target 3 min</span></div>
+          </div>
+        </div>
+        <div class="kr-item">
+          <div class="kr-text">
+            <strong>Implement automated chaos engineering for top 5 services</strong>
+            <span>Current: 2/5 services · GameDay #1 completed Feb 20</span>
+          </div>
+          <div class="kr-val val-red">40%</div>
+          <div class="kr-bar-wrap">
+            <div class="kr-track"><div class="kr-fill" data-w="40" style="background:var(--red)"></div></div>
+            <div class="kr-range"><span>0%</span><span>Target 100%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OKR 4 -->
+    <div class="okr-block">
+      <div class="okr-header">
+        <div class="okr-objective">Build a high-performance, continuously learning engineering team</div>
+        <div class="okr-score-pill">
+          <div>
+            <div class="okr-pct val-green">85%</div>
+            <div class="okr-pct-label">Progress</div>
+          </div>
+        </div>
+      </div>
+      <div class="kr-list">
+        <div class="kr-item">
+          <div class="kr-text">
+            <strong>100% team completion of SRE certification program</strong>
+            <span>Current: 6/8 members certified · 2 in progress</span>
+          </div>
+          <div class="kr-val val-yellow">75%</div>
+          <div class="kr-bar-wrap">
+            <div class="kr-track"><div class="kr-fill" data-w="75" style="background:var(--yellow)"></div></div>
+            <div class="kr-range"><span>0%</span><span>Target 100%</span></div>
+          </div>
+        </div>
+        <div class="kr-item">
+          <div class="kr-text">
+            <strong>Conduct bi-weekly blameless postmortems for all P1/P2</strong>
+            <span>Current: 100% · All 8 postmortems completed on time</span>
+          </div>
+          <div class="kr-val val-green">100%</div>
+          <div class="kr-bar-wrap">
+            <div class="kr-track"><div class="kr-fill" data-w="100" style="background:var(--green)"></div></div>
+            <div class="kr-range"><span>0%</span><span>Target 100%</span></div>
+          </div>
+        </div>
+        <div class="kr-item">
+          <div class="kr-text">
+            <strong>Achieve eNPS score of 40+ within the SRE team</strong>
+            <span>Current: 44 · Highest score in regional IT unit</span>
+          </div>
+          <div class="kr-val val-green">44</div>
+          <div class="kr-bar-wrap">
+            <div class="kr-track"><div class="kr-fill" data-w="88" style="background:var(--green)"></div></div>
+            <div class="kr-range"><span>0</span><span>Target 40</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PROJECTS ══ -->
+  <div class="projects-section">
+    <div class="sec-heading">
+      <span class="sec-num">03</span>
+      <div class="sec-line"></div>
+      <span class="sec-title">Project Portfolio Status</span>
+    </div>
+    <table class="proj-table">
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Owner</th>
+          <th>Status</th>
+          <th>Progress</th>
+          <th>Due</th>
+          <th>Budget</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <span class="proj-name">Observability Platform v2</span>
+            <span class="proj-desc">Unified tracing, metrics &amp; logs — Datadog + OpenTelemetry</span>
+          </td>
+          <td style="font-size:12px; color:var(--ink2)">M. Torres</td>
+          <td><span class="status-chip chip-on-track">● On Track</span></td>
+          <td>
+            <div class="prog-wrap">
+              <div class="prog-track"><div class="prog-fill" data-w="72" style="background:var(--green)"></div></div>
+              <span class="prog-pct">72%</span>
+            </div>
+          </td>
+          <td style="font-size:12px; color:var(--muted)">Apr 30</td>
+          <td style="font-size:12px; color:var(--ink2)">$48K</td>
+        </tr>
+        <tr>
+          <td>
+            <span class="proj-name">CI/CD Pipeline Modernization</span>
+            <span class="proj-desc">GitHub Actions migration from Jenkins — 12 services</span>
+          </td>
+          <td style="font-size:12px; color:var(--ink2)">R. Gómez</td>
+          <td><span class="status-chip chip-on-track">● On Track</span></td>
+          <td>
+            <div class="prog-wrap">
+              <div class="prog-track"><div class="prog-fill" data-w="65" style="background:var(--green)"></div></div>
+              <span class="prog-pct">65%</span>
+            </div>
+          </td>
+          <td style="font-size:12px; color:var(--muted)">May 15</td>
+          <td style="font-size:12px; color:var(--ink2)">$32K</td>
+        </tr>
+        <tr>
+          <td>
+            <span class="proj-name">Auth Service Hardening</span>
+            <span class="proj-desc">SSO refactor, MFA enforcement &amp; LATAM token optimization</span>
+          </td>
+          <td style="font-size:12px; color:var(--ink2)">C. Reyes</td>
+          <td><span class="status-chip chip-at-risk">⚠ At Risk</span></td>
+          <td>
+            <div class="prog-wrap">
+              <div class="prog-track"><div class="prog-fill" data-w="38" style="background:var(--yellow)"></div></div>
+              <span class="prog-pct">38%</span>
+            </div>
+          </td>
+          <td style="font-size:12px; color:var(--muted)">Apr 15</td>
+          <td style="font-size:12px; color:var(--ink2)">$27K</td>
+        </tr>
+        <tr>
+          <td>
+            <span class="proj-name">Chaos Engineering Program</span>
+            <span class="proj-desc">GameDays, fault injection &amp; resilience validation framework</span>
+          </td>
+          <td style="font-size:12px; color:var(--ink2)">L. Vargas</td>
+          <td><span class="status-chip chip-delayed">✕ Delayed</span></td>
+          <td>
+            <div class="prog-wrap">
+              <div class="prog-track"><div class="prog-fill" data-w="40" style="background:var(--red)"></div></div>
+              <span class="prog-pct">40%</span>
+            </div>
+          </td>
+          <td style="font-size:12px; color:var(--muted)">Mar 31</td>
+          <td style="font-size:12px; color:var(--ink2)">$19K</td>
+        </tr>
+        <tr>
+          <td>
+            <span class="proj-name">Inventory Service SLO Remediation</span>
+            <span class="proj-desc">DB replica optimization &amp; OMS failover redesign</span>
+          </td>
+          <td style="font-size:12px; color:var(--ink2)">A. Mora</td>
+          <td><span class="status-chip chip-at-risk">⚠ At Risk</span></td>
+          <td>
+            <div class="prog-wrap">
+              <div class="prog-track"><div class="prog-fill" data-w="55" style="background:var(--yellow)"></div></div>
+              <span class="prog-pct">55%</span>
+            </div>
+          </td>
+          <td style="font-size:12px; color:var(--muted)">Apr 20</td>
+          <td style="font-size:12px; color:var(--ink2)">$22K</td>
+        </tr>
+        <tr>
+          <td>
+            <span class="proj-name">SRE Certification Program</span>
+            <span class="proj-desc">Google SRE &amp; CKA certifications for full team</span>
+          </td>
+          <td style="font-size:12px; color:var(--ink2)">A. Carranza</td>
+          <td><span class="status-chip chip-done">✓ Closing</span></td>
+          <td>
+            <div class="prog-wrap">
+              <div class="prog-track"><div class="prog-fill" data-w="92" style="background:var(--blue)"></div></div>
+              <span class="prog-pct">92%</span>
+            </div>
+          </td>
+          <td style="font-size:12px; color:var(--muted)">Apr 05</td>
+          <td style="font-size:12px; color:var(--ink2)">$14K</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══ BLOCKERS ══ -->
+  <div class="blockers-section">
+    <div class="sec-heading">
+      <span class="sec-num">04</span>
+      <div class="sec-line"></div>
+      <span class="sec-title">Active Blockers &amp; Escalations</span>
+    </div>
+    <div class="blockers-grid">
+      <div class="blocker-card">
+        <div class="blocker-tag high">▲ High Priority</div>
+        <div class="blocker-title">Auth Service vendor dependency unresolved</div>
+        <div class="blocker-body">Third-party SSO vendor has not delivered the LATAM-specific token API update promised for Feb 28. Impacts Auth Hardening project timeline and ongoing INC-0083.</div>
+        <div class="blocker-meta">
+          <span><strong>Project:</strong> Auth Hardening</span>
+          <span><strong>Owner:</strong> C. Reyes</span>
+          <span><strong>Since:</strong> Mar 1</span>
+        </div>
+      </div>
+      <div class="blocker-card">
+        <div class="blocker-tag high">▲ High Priority</div>
+        <div class="blocker-title">Approval workflow redesign stalled in Legal review</div>
+        <div class="blocker-body">CI/CD lead time reduction is blocked by a policy change requiring Legal sign-off on automated production deployments. 3 weeks without response. Escalation needed.</div>
+        <div class="blocker-meta">
+          <span><strong>Project:</strong> CI/CD Modernization</span>
+          <span><strong>Owner:</strong> R. Gómez</span>
+          <span><strong>Since:</strong> Mar 8</span>
+        </div>
+      </div>
+      <div class="blocker-card medium">
+        <div class="blocker-tag medium">● Medium Priority</div>
+        <div class="blocker-title">Chaos Engineering: shared environment conflicts</div>
+        <div class="blocker-body">GameDay exercises require isolated staging environments. Current shared staging is used by 3 other teams, causing scheduling conflicts and limiting fault injection windows.</div>
+        <div class="blocker-meta">
+          <span><strong>Project:</strong> Chaos Engineering</span>
+          <span><strong>Owner:</strong> L. Vargas</span>
+          <span><strong>Since:</strong> Feb 15</span>
+        </div>
+      </div>
+      <div class="blocker-card medium">
+        <div class="blocker-tag medium">● Medium Priority</div>
+        <div class="blocker-title">Inventory DB: cloud budget approval pending</div>
+        <div class="blocker-body">Replica scaling requires additional RDS instance provisioning. Cloud FinOps team has the request pending for 2 weeks. Without approval, SLO remediation will miss deadline.</div>
+        <div class="blocker-meta">
+          <span><strong>Project:</strong> Inventory SLO</span>
+          <span><strong>Owner:</strong> A. Mora</span>
+          <span><strong>Since:</strong> Mar 18</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TEAM ══ -->
+  <div class="team-section">
+    <div class="sec-heading">
+      <span class="sec-num">05</span>
+      <div class="sec-line"></div>
+      <span class="sec-title">Team Highlights</span>
+    </div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-avatar" style="background:var(--accent2)">MC</div>
+        <div class="team-name">M. Torres</div>
+        <div class="team-role">Senior SRE</div>
+        <div class="team-contrib">Leading Observability Platform — on track for Q2 full rollout</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar" style="background:var(--green)">RG</div>
+        <div class="team-name">R. Gómez</div>
+        <div class="team-role">DevOps Engineer</div>
+        <div class="team-contrib">Migrated 8 of 12 services to GitHub Actions ahead of schedule</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar" style="background:var(--accent)">CR</div>
+        <div class="team-name">C. Reyes</div>
+        <div class="team-role">Security SRE</div>
+        <div class="team-contrib">Unblocking Auth SSO — direct escalation with vendor initiated</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar" style="background:#6b5e2f">LV</div>
+        <div class="team-name">L. Vargas</div>
+        <div class="team-role">SRE Engineer</div>
+        <div class="team-contrib">Completed GameDay #1 · resilience score improved 18pts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ Q2 OUTLOOK ══ -->
+  <div class="outlook-section">
+    <div class="sec-heading">
+      <span class="sec-num">06</span>
+      <div class="sec-line"></div>
+      <span class="sec-title">Q2 Outlook &amp; Actions</span>
+    </div>
+    <div class="outlook-grid">
+      <div class="outlook-col risks">
+        <div class="outlook-label">Risks to Watch</div>
+        <ul class="outlook-list">
+          <li>Auth SSO vendor may delay into Q2 if no resolution by Apr 15</li>
+          <li>Inventory SLO breach risk if DB budget not approved this week</li>
+          <li>Chaos Engineering scope may need reduction to meet Q2 targets</li>
+          <li>Team capacity at 95% — any new P1 incidents may delay projects</li>
+        </ul>
+      </div>
+      <div class="outlook-col actions">
+        <div class="outlook-label">Leadership Actions Needed</div>
+        <ul class="outlook-list">
+          <li>Escalate SSO vendor contract to procurement leadership</li>
+          <li>Approve RDS budget increase ($8K) for Inventory remediation</li>
+          <li>Legal team SLA on CI/CD policy review — request 5-day turnaround</li>
+          <li>Dedicated staging env for Chaos Engineering (shared infra conflict)</li>
+        </ul>
+      </div>
+      <div class="outlook-col wins">
+        <div class="outlook-label">Q1 Wins to Celebrate</div>
+        <ul class="outlook-list">
+          <li>Zero P1 incidents in March — best streak in 18 months</li>
+          <li>Change failure rate 3.8% — well below 5% industry benchmark</li>
+          <li>Postmortem culture 100% adoption — blameless &amp; on schedule</li>
+          <li>eNPS 44 — highest score in regional IT, recognized by CHRO</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ══ -->
+  <footer>
+    <div class="footer-left">Generated with Claude AI · NAM DevOps &amp; SRE · Bogotá Regional Hub · Q1 2026</div>
+    <div class="footer-right">Confidential · For Leadership Use Only</div>
+  </footer>
+
+</div>
+
+<script>
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.querySelectorAll('.kr-fill, .prog-fill').forEach(el => {
+        el.style.width = (el.dataset.w || 0) + '%';
+      });
+    }, 400);
+  });
+</script>
+</body>
+</html>

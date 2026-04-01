@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SRE Command Center — NAM eCommerce Q1 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #090e1a;
+    --surface: #0f1829;
+    --surface2: #162035;
+    --border: #1e2d4a;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --font-mono: 'Space Mono', monospace;
+    --font-display: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-display);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .header-left {}
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  h1 span {
+    color: var(--accent);
+  }
+
+  .subtitle {
+    margin-top: 8px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+
+  .header-right {
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  .header-right strong {
+    color: var(--accent);
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+
+  /* Overall health strip */
+  .health-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+
+  .health-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .health-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+  }
+
+  .health-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .health-card.green::after { background: var(--green); }
+  .health-card.yellow::after { background: var(--yellow); }
+  .health-card.red::after { background: var(--red); }
+  .health-card.blue::after { background: var(--accent); }
+
+  .hc-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .hc-value {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .hc-value.green { color: var(--green); }
+  .hc-value.yellow { color: var(--yellow); }
+  .hc-value.red { color: var(--red); }
+  .hc-value.blue { color: var(--accent); }
+
+  .hc-sub {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* Section title */
+  .section-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Charts row */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+  }
+
+  .card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+
+  /* Availability Bar Chart */
+  .bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .bar-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 60px;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  .bar-label { color: var(--muted); }
+
+  .bar-track {
+    height: 8px;
+    background: var(--surface2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1.2s cubic-bezier(0.16,1,0.3,1);
+    width: 0;
+  }
+
+  .bar-fill.green { background: var(--green); }
+  .bar-fill.yellow { background: var(--yellow); }
+  .bar-fill.red { background: var(--red); }
+
+  .bar-val { color: var(--text); text-align: right; }
+
+  /* Donut Chart */
+  .donut-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .donut-svg { overflow: visible; }
+
+  .donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+
+  .legend-left { display: flex; align-items: center; color: var(--muted); }
+  .legend-val { color: var(--text); font-weight: 700; }
+
+  /* Incidents table */
+  .incidents-section {
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
+  thead th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(30,45,74,0.5);
+    transition: background 0.15s;
+  }
+
+  tbody tr:hover { background: var(--surface2); }
+
+  tbody td {
+    padding: 12px 16px;
+    color: var(--text);
+    vertical-align: middle;
+  }
+
+  .sev-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .sev-p1 { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .sev-p2 { background: rgba(245,158,11,0.15); color: var(--yellow); border: 1px solid rgba(245,158,11,0.3); }
+  .sev-p3 { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+
+  .status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .resolved { background: rgba(16,185,129,0.12); color: var(--green); }
+  .open { background: rgba(239,68,68,0.12); color: var(--red); }
+
+  /* MTTR + SLO grid */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    animation: fadeUp 0.6s ease 0.4s both;
+  }
+
+  /* SLO gauge */
+  .slo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .slo-item {}
+
+  .slo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+
+  .slo-name {
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  .slo-pct {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .slo-track {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .slo-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1.4s cubic-bezier(0.16,1,0.3,1);
+    width: 0;
+  }
+
+  .slo-target-line {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    width: 2px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 1px;
+  }
+
+  .slo-sub {
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  /* MTTR stats */
+  .mttr-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .mttr-item {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 16px;
+    border: 1px solid var(--border);
+  }
+
+  .mttr-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .mttr-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+
+  .mttr-unit {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    margin-left: 2px;
+  }
+
+  .mttr-change {
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  .up { color: var(--green); }
+  .down { color: var(--red); }
+
+  /* Sparkline mini chart */
+  .sparkline-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 32px;
+    margin-top: 12px;
+  }
+
+  .spark-bar {
+    flex: 1;
+    border-radius: 2px 2px 0 0;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+
+  .spark-bar:hover { opacity: 1; }
+
+  /* Footer */
+  footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    animation: fadeUp 0.6s ease 0.5s both;
+  }
+
+  footer span { color: var(--accent); }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  @media (max-width: 768px) {
+    .health-strip { grid-template-columns: repeat(2, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
+    .bottom-grid { grid-template-columns: 1fr; }
+    .header-right { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <div class="badge">● Live Report</div>
+      <h1>SRE Command Center<br><span>NAM eCommerce</span></h1>
+      <p class="subtitle">// Q1 2026 — Bogotá Regional Hub</p>
+    </div>
+    <div class="header-right">
+      <strong>Period</strong>
+      Jan 01 – Mar 31, 2026<br>
+      <strong>Region</strong>
+      NAM + Caribbean<br>
+      <strong>Generated</strong>
+      March 31, 2026<br>
+      <strong>Team</strong>
+      DevOps & SRE Unit
+    </div>
+  </header>
+
+  <!-- KPI STRIP -->
+  <div class="section-title">// Overall Health</div>
+  <div class="health-strip">
+    <div class="health-card green">
+      <div class="hc-label">Avg Availability</div>
+      <div class="hc-value green">99.87%</div>
+      <div class="hc-sub">↑ +0.04% vs Q4 2025</div>
+    </div>
+    <div class="health-card yellow">
+      <div class="hc-label">Total Incidents</div>
+      <div class="hc-value yellow">34</div>
+      <div class="hc-sub">↓ 12 fewer than Q4</div>
+    </div>
+    <div class="health-card blue">
+      <div class="hc-label">Avg MTTR</div>
+      <div class="hc-value blue">23<span style="font-size:16px">min</span></div>
+      <div class="hc-sub">↓ -8min vs Q4 2025</div>
+    </div>
+    <div class="health-card green">
+      <div class="hc-label">SLO Compliance</div>
+      <div class="hc-value green">97.2%</div>
+      <div class="hc-sub">3 SLOs breached</div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW -->
+  <div class="section-title">// Service Availability by System</div>
+  <div class="charts-row">
+
+    <!-- Bar Chart -->
+    <div class="card">
+      <h3>Monthly Availability — Q1 2026</h3>
+      <div class="bar-chart" id="barChart">
+        <!-- Jan -->
+        <div style="margin-bottom:8px; font-family:var(--font-mono); font-size:10px; color:var(--accent); text-transform:uppercase; letter-spacing:0.1em;">January</div>
+        <div class="bar-row"><span class="bar-label">Checkout</span><div class="bar-track"><div class="bar-fill green" data-w="99.91"></div></div><span class="bar-val">99.91%</span></div>
+        <div class="bar-row"><span class="bar-label">Product API</span><div class="bar-track"><div class="bar-fill green" data-w="99.78"></div></div><span class="bar-val">99.78%</span></div>
+        <div class="bar-row"><span class="bar-label">Auth Service</span><div class="bar-track"><div class="bar-fill yellow" data-w="99.45"></div></div><span class="bar-val">99.45%</span></div>
+        <div class="bar-row"><span class="bar-label">CDN / Assets</span><div class="bar-track"><div class="bar-fill green" data-w="99.99"></div></div><span class="bar-val">99.99%</span></div>
+        <div class="bar-row"><span class="bar-label">Inventory</span><div class="bar-track"><div class="bar-fill yellow" data-w="98.90"></div></div><span class="bar-val">98.90%</span></div>
+        <!-- Feb -->
+        <div style="margin: 14px 0 8px; font-family:var(--font-mono); font-size:10px; color:var(--accent); text-transform:uppercase; letter-spacing:0.1em;">February</div>
+        <div class="bar-row"><span class="bar-label">Checkout</span><div class="bar-track"><div class="bar-fill green" data-w="99.95"></div></div><span class="bar-val">99.95%</span></div>
+        <div class="bar-row"><span class="bar-label">Product API</span><div class="bar-track"><div class="bar-fill green" data-w="99.88"></div></div><span class="bar-val">99.88%</span></div>
+        <div class="bar-row"><span class="bar-label">Auth Service</span><div class="bar-track"><div class="bar-fill green" data-w="99.71"></div></div><span class="bar-val">99.71%</span></div>
+        <div class="bar-row"><span class="bar-label">CDN / Assets</span><div class="bar-track"><div class="bar-fill green" data-w="100"></div></div><span class="bar-val">100%</span></div>
+        <div class="bar-row"><span class="bar-label">Inventory</span><div class="bar-track"><div class="bar-fill red" data-w="97.30"></div></div><span class="bar-val">97.30%</span></div>
+        <!-- Mar -->
+        <div style="margin: 14px 0 8px; font-family:var(--font-mono); font-size:10px; color:var(--accent); text-transform:uppercase; letter-spacing:0.1em;">March</div>
+        <div class="bar-row"><span class="bar-label">Checkout</span><div class="bar-track"><div class="bar-fill green" data-w="99.89"></div></div><span class="bar-val">99.89%</span></div>
+        <div class="bar-row"><span class="bar-label">Product API</span><div class="bar-track"><div class="bar-fill green" data-w="99.93"></div></div><span class="bar-val">99.93%</span></div>
+        <div class="bar-row"><span class="bar-label">Auth Service</span><div class="bar-track"><div class="bar-fill green" data-w="99.80"></div></div><span class="bar-val">99.80%</span></div>
+        <div class="bar-row"><span class="bar-label">CDN / Assets</span><div class="bar-track"><div class="bar-fill green" data-w="99.97"></div></div><span class="bar-val">99.97%</span></div>
+        <div class="bar-row"><span class="bar-label">Inventory</span><div class="bar-track"><div class="bar-fill yellow" data-w="99.10"></div></div><span class="bar-val">99.10%</span></div>
+      </div>
+    </div>
+
+    <!-- Donut: Incidents by type -->
+    <div class="card">
+      <h3>Incidents by Category</h3>
+      <div class="donut-wrap">
+        <svg class="donut-svg" width="140" height="140" viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="52" fill="none" stroke="#162035" stroke-width="20"/>
+          <!-- Infrastructure 38% -->
+          <circle cx="70" cy="70" r="52" fill="none" stroke="#00d4ff" stroke-width="20"
+            stroke-dasharray="123.6 203.4" stroke-dashoffset="0" transform="rotate(-90 70 70)"/>
+          <!-- App/Code 26% -->
+          <circle cx="70" cy="70" r="52" fill="none" stroke="#7c3aed" stroke-width="20"
+            stroke-dasharray="84.6 242.4" stroke-dashoffset="-123.6" transform="rotate(-90 70 70)"/>
+          <!-- Network 21% -->
+          <circle cx="70" cy="70" r="52" fill="none" stroke="#10b981" stroke-width="20"
+            stroke-dasharray="68.4 258.6" stroke-dashoffset="-208.2" transform="rotate(-90 70 70)"/>
+          <!-- 3rd Party 15% -->
+          <circle cx="70" cy="70" r="52" fill="none" stroke="#f59e0b" stroke-width="20"
+            stroke-dasharray="48.9 278.1" stroke-dashoffset="-276.6" transform="rotate(-90 70 70)"/>
+          <text x="70" y="65" text-anchor="middle" fill="#e2e8f0" font-family="Syne" font-size="22" font-weight="800">34</text>
+          <text x="70" y="82" text-anchor="middle" fill="#64748b" font-family="Space Mono" font-size="9">incidents</text>
+        </svg>
+        <div class="donut-legend">
+          <div class="legend-item">
+            <div class="legend-left"><div class="legend-dot" style="background:#00d4ff"></div>Infrastructure</div>
+            <div class="legend-val">13 — 38%</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-left"><div class="legend-dot" style="background:#7c3aed"></div>App / Code</div>
+            <div class="legend-val">9 — 26%</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-left"><div class="legend-dot" style="background:#10b981"></div>Network</div>
+            <div class="legend-val">7 — 21%</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-left"><div class="legend-dot" style="background:#f59e0b"></div>3rd Party</div>
+            <div class="legend-val">5 — 15%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INCIDENTS TABLE -->
+  <div class="incidents-section">
+    <div class="section-title">// Major Incidents Log — Q1 2026</div>
+    <div class="card" style="padding:0; overflow:hidden;">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>System</th>
+            <th>Description</th>
+            <th>Severity</th>
+            <th>MTTR</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--accent)">INC-0041</td>
+            <td>Jan 07</td>
+            <td>Checkout</td>
+            <td>Payment gateway timeout — US East</td>
+            <td><span class="sev-badge sev-p1">P1</span></td>
+            <td>34 min</td>
+            <td><span class="status-badge resolved">Resolved</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent)">INC-0048</td>
+            <td>Jan 19</td>
+            <td>Inventory</td>
+            <td>DB replica lag exceeded threshold</td>
+            <td><span class="sev-badge sev-p2">P2</span></td>
+            <td>18 min</td>
+            <td><span class="status-badge resolved">Resolved</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent)">INC-0055</td>
+            <td>Feb 03</td>
+            <td>Auth Service</td>
+            <td>Token validation errors — Canada region</td>
+            <td><span class="sev-badge sev-p2">P2</span></td>
+            <td>27 min</td>
+            <td><span class="status-badge resolved">Resolved</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent)">INC-0061</td>
+            <td>Feb 14</td>
+            <td>Inventory</td>
+            <td>Stock sync failure — 3rd party OMS down</td>
+            <td><span class="sev-badge sev-p1">P1</span></td>
+            <td>67 min</td>
+            <td><span class="status-badge resolved">Resolved</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent)">INC-0069</td>
+            <td>Feb 28</td>
+            <td>Product API</td>
+            <td>Rate limit breach — marketing campaign spike</td>
+            <td><span class="sev-badge sev-p2">P2</span></td>
+            <td>15 min</td>
+            <td><span class="status-badge resolved">Resolved</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent)">INC-0074</td>
+            <td>Mar 11</td>
+            <td>CDN / Assets</td>
+            <td>Cache purge failure — stale PDP images</td>
+            <td><span class="sev-badge sev-p3">P3</span></td>
+            <td>9 min</td>
+            <td><span class="status-badge resolved">Resolved</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent)">INC-0081</td>
+            <td>Mar 22</td>
+            <td>Checkout</td>
+            <td>Latency spike — new deploy rollback triggered</td>
+            <td><span class="sev-badge sev-p2">P2</span></td>
+            <td>21 min</td>
+            <td><span class="status-badge resolved">Resolved</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent)">INC-0083</td>
+            <td>Mar 29</td>
+            <td>Auth Service</td>
+            <td>SSO intermittent failures — LATAM users</td>
+            <td><span class="sev-badge sev-p2">P2</span></td>
+            <td>—</td>
+            <td><span class="status-badge open">Open</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BOTTOM: SLO + MTTR -->
+  <div class="section-title">// SLOs & Recovery Metrics</div>
+  <div class="bottom-grid">
+
+    <!-- SLOs -->
+    <div class="card">
+      <h3>SLO Status — Q1 2026</h3>
+      <div class="slo-list">
+        <div class="slo-item">
+          <div class="slo-header">
+            <span class="slo-name">Checkout Availability</span>
+            <span class="slo-pct" style="color:var(--green)">99.92%</span>
+          </div>
+          <div class="slo-track">
+            <div class="slo-fill" data-w="99.92" style="background:var(--green)"></div>
+            <div class="slo-target-line" style="left:99.5%"></div>
+          </div>
+          <div class="slo-sub">Target: 99.5% · ✓ Compliant</div>
+        </div>
+        <div class="slo-item">
+          <div class="slo-header">
+            <span class="slo-name">API Response &lt; 300ms</span>
+            <span class="slo-pct" style="color:var(--green)">98.4%</span>
+          </div>
+          <div class="slo-track">
+            <div class="slo-fill" data-w="98.4" style="background:var(--green)"></div>
+            <div class="slo-target-line" style="left:98%"></div>
+          </div>
+          <div class="slo-sub">Target: 98% · ✓ Compliant</div>
+        </div>
+        <div class="slo-item">
+          <div class="slo-header">
+            <span class="slo-name">Inventory Availability</span>
+            <span class="slo-pct" style="color:var(--yellow)">98.4%</span>
+          </div>
+          <div class="slo-track">
+            <div class="slo-fill" data-w="98.4" style="background:var(--yellow)"></div>
+            <div class="slo-target-line" style="left:99%"></div>
+          </div>
+          <div class="slo-sub">Target: 99% · ⚠ Breached (Feb spike)</div>
+        </div>
+        <div class="slo-item">
+          <div class="slo-header">
+            <span class="slo-name">Auth Success Rate</span>
+            <span class="slo-pct" style="color:var(--green)">99.65%</span>
+          </div>
+          <div class="slo-track">
+            <div class="slo-fill" data-w="99.65" style="background:var(--green)"></div>
+            <div class="slo-target-line" style="left:99.5%"></div>
+          </div>
+          <div class="slo-sub">Target: 99.5% · ✓ Compliant</div>
+        </div>
+        <div class="slo-item">
+          <div class="slo-header">
+            <span class="slo-name">Error Rate &lt; 0.5%</span>
+            <span class="slo-pct" style="color:var(--green)">99.1%</span>
+          </div>
+          <div class="slo-track">
+            <div class="slo-fill" data-w="99.1" style="background:var(--green)"></div>
+            <div class="slo-target-line" style="left:99.5%"></div>
+          </div>
+          <div class="slo-sub">Target: 99.5% · ✓ Compliant</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MTTR by Severity -->
+    <div class="card">
+      <h3>MTTR by Severity</h3>
+      <div class="mttr-grid">
+        <div class="mttr-item">
+          <div class="mttr-label">P1 Avg MTTR</div>
+          <div class="mttr-value">51<span class="mttr-unit">min</span></div>
+          <div class="mttr-change down">↑ +3min vs Q4</div>
+        </div>
+        <div class="mttr-item">
+          <div class="mttr-label">P2 Avg MTTR</div>
+          <div class="mttr-value">22<span class="mttr-unit">min</span></div>
+          <div class="mttr-change up">↓ -11min vs Q4</div>
+        </div>
+        <div class="mttr-item">
+          <div class="mttr-label">P3 Avg MTTR</div>
+          <div class="mttr-value">9<span class="mttr-unit">min</span></div>
+          <div class="mttr-change up">↓ -4min vs Q4</div>
+        </div>
+        <div class="mttr-item">
+          <div class="mttr-label">MTTD (detect)</div>
+          <div class="mttr-value">4<span class="mttr-unit">min</span></div>
+          <div class="mttr-change up">↓ -2min vs Q4</div>
+        </div>
+      </div>
+
+      <!-- Incident trend sparkline -->
+      <div style="margin-top:20px;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px;">Incidents per week — Q1</div>
+        <div class="sparkline-row">
+          <div class="spark-bar" style="height:60%; background:var(--accent);" title="W1: 4"></div>
+          <div class="spark-bar" style="height:40%; background:var(--accent);" title="W2: 2"></div>
+          <div class="spark-bar" style="height:80%; background:var(--red);" title="W3: 5"></div>
+          <div class="spark-bar" style="height:60%; background:var(--accent);" title="W4: 4"></div>
+          <div class="spark-bar" style="height:40%; background:var(--accent);" title="W5: 2"></div>
+          <div class="spark-bar" style="height:100%; background:var(--red);" title="W6: 7"></div>
+          <div class="spark-bar" style="height:50%; background:var(--accent);" title="W7: 3"></div>
+          <div class="spark-bar" style="height:30%; background:var(--green);" title="W8: 1"></div>
+          <div class="spark-bar" style="height:50%; background:var(--accent);" title="W9: 3"></div>
+          <div class="spark-bar" style="height:40%; background:var(--accent);" title="W10: 2"></div>
+          <div class="spark-bar" style="height:20%; background:var(--green);" title="W11: 1"></div>
+          <div class="spark-bar" style="height:30%; background:var(--green);" title="W12: 1"></div>
+        </div>
+      </div>
+
+      <!-- Runbook compliance -->
+      <div style="margin-top:20px; padding:14px; background:rgba(0,212,255,0.05); border:1px solid rgba(0,212,255,0.15); border-radius:6px;">
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--accent); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px;">Runbook Compliance</div>
+        <div style="font-size:28px; font-weight:800; color:var(--text);">94%</div>
+        <div style="font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-top:4px;">↑ +7% vs Q4 · Target: 90%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>Generated with <span>Claude AI</span> · NAM DevOps & SRE Team · Bogotá HQ</div>
+    <div>Q1 2026 · Confidential Internal Use</div>
+  </footer>
+
+</div>
+
+<script>
+  // Animate bars on load
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.querySelectorAll('.bar-fill').forEach(bar => {
+        const w = parseFloat(bar.dataset.w);
+        // Scale: 97% maps to ~0%, 100% maps to 100%
+        const pct = Math.max(0, ((w - 97) / 3) * 100);
+        bar.style.width = pct + '%';
+      });
+      document.querySelectorAll('.slo-fill').forEach(bar => {
+        bar.style.width = parseFloat(bar.dataset.w) + '%';
+      });
+    }, 300);
+  });
+</script>
+</body>
+</html>

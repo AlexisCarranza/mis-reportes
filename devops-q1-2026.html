@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevOps Pipeline & DORA Metrics — Q1 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Barlow:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07090f;
+    --surface: #0d1117;
+    --surface2: #161b22;
+    --surface3: #1c2230;
+    --border: #21262d;
+    --border2: #30363d;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --purple: #bc8cff;
+    --orange: #f0883e;
+    --red: #f85149;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --text: #c9d1d9;
+    --text2: #8b949e;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --font-body: 'Barlow', sans-serif;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Subtle dot grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(88,166,255,0.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 48px 32px 96px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: start;
+    margin-bottom: 56px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--border);
+    animation: fadeDown 0.7s ease both;
+  }
+
+  .header-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+  }
+
+  .header-tag::before {
+    content: '▶';
+    font-size: 8px;
+    animation: pulse 2s infinite;
+  }
+
+  h1 {
+    font-size: clamp(30px, 4vw, 46px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #f0f6fc;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .header-sub {
+    margin-top: 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.7;
+  }
+
+  .header-right {
+    text-align: right;
+  }
+
+  .elite-badge {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(63,185,80,0.12), rgba(63,185,80,0.04));
+    border: 1px solid rgba(63,185,80,0.3);
+    border-radius: 8px;
+    padding: 16px 24px;
+  }
+
+  .elite-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--green);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .elite-value {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--green);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .elite-sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text2);
+    margin-top: 4px;
+  }
+
+  /* ── SECTION ── */
+  .sec-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .sec-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── DORA 4 BIG CARDS ── */
+  .dora-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+
+  .dora-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .dora-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border2);
+  }
+
+  .dora-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .dora-card.elite::after { background: var(--green); }
+  .dora-card.high::after { background: var(--accent); }
+  .dora-card.medium::after { background: var(--yellow); }
+
+  .dora-num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text2);
+    margin-bottom: 12px;
+    letter-spacing: 0.1em;
+  }
+
+  .dora-metric {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+  }
+
+  .dora-value {
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+
+  .dora-unit {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text2);
+    margin-left: 2px;
+  }
+
+  .dora-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    margin-bottom: 16px;
+  }
+
+  .dora-benchmark {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    width: fit-content;
+  }
+
+  .bench-elite { background: rgba(63,185,80,0.1); color: var(--green); border: 1px solid rgba(63,185,80,0.2); }
+  .bench-high { background: rgba(88,166,255,0.1); color: var(--accent); border: 1px solid rgba(88,166,255,0.2); }
+  .bench-medium { background: rgba(210,153,34,0.1); color: var(--yellow); border: 1px solid rgba(210,153,34,0.2); }
+
+  .dora-trend {
+    margin-top: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  /* ── TREND CHARTS ── */
+  .trends-section {
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  .trends-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+  }
+
+  .chart-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .chart-sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text2);
+    margin-bottom: 20px;
+  }
+
+  /* Bar chart */
+  .bar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .bar-row {
+    display: grid;
+    grid-template-columns: 32px 1fr 48px;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  .bar-month { color: var(--text2); font-size: 10px; }
+
+  .bar-track {
+    height: 20px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--bg);
+    font-weight: 600;
+    transition: width 1.2s cubic-bezier(0.16,1,0.3,1);
+    width: 0;
+    white-space: nowrap;
+  }
+
+  .bar-val { color: var(--text); text-align: right; }
+
+  /* Line sparkline */
+  .sparkline-wrap {
+    position: relative;
+    height: 80px;
+    margin-bottom: 12px;
+  }
+
+  .sparkline-wrap svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .spark-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text2);
+  }
+
+  /* ── PIPELINE TABLE ── */
+  .pipeline-section {
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease 0.25s both;
+  }
+
+  .pipe-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .pipe-table thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text2);
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pipe-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  .pipe-table tbody tr:last-child { border-bottom: none; }
+  .pipe-table tbody tr:hover { background: var(--surface2); }
+
+  .pipe-table tbody td {
+    padding: 14px 16px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    vertical-align: middle;
+  }
+
+  .service-name {
+    color: var(--text);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .service-tech {
+    font-size: 10px;
+    color: var(--text2);
+  }
+
+  .freq-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .freq-elite { background: rgba(63,185,80,0.1); color: var(--green); }
+  .freq-high { background: rgba(88,166,255,0.1); color: var(--accent); }
+  .freq-medium { background: rgba(210,153,34,0.1); color: var(--yellow); }
+
+  .mini-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mini-track {
+    flex: 1;
+    height: 4px;
+    background: var(--surface3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .mini-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1.4s cubic-bezier(0.16,1,0.3,1);
+    width: 0;
+  }
+
+  .mini-val {
+    font-size: 11px;
+    color: var(--text);
+    min-width: 36px;
+    text-align: right;
+  }
+
+  /* ── INCIDENTS vs DEPLOYS ── */
+  .correlation-section {
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+
+  .corr-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+
+  .corr-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .corr-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text2);
+    margin-bottom: 12px;
+  }
+
+  .corr-value {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+
+  .corr-sub {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+
+  .trend-up { color: var(--green); }
+  .trend-down { color: var(--red); }
+  .trend-neutral { color: var(--accent); }
+
+  /* ── BENCHMARK MATRIX ── */
+  .benchmark-section {
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease 0.35s both;
+  }
+
+  .bench-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .bench-table th {
+    padding: 12px 20px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text2);
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .bench-table td {
+    padding: 14px 20px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .bench-table tr:last-child td { border-bottom: none; }
+
+  .bench-table tr.our-row {
+    background: rgba(88,166,255,0.04);
+  }
+
+  .bench-table tr.our-row td:first-child {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .dot-elite { color: var(--green); }
+  .dot-high { color: var(--accent); }
+  .dot-medium { color: var(--yellow); }
+  .dot-low { color: var(--red); }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text2);
+    animation: fadeUp 0.6s ease 0.4s both;
+  }
+
+  footer span { color: var(--accent); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeDown {
+    from { opacity:0; transform:translateY(-16px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity:1; }
+    50% { opacity:0.3; }
+  }
+
+  @media (max-width: 900px) {
+    .dora-grid { grid-template-columns: repeat(2,1fr); }
+    .trends-grid { grid-template-columns: 1fr; }
+    .corr-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 600px) {
+    .dora-grid { grid-template-columns: 1fr; }
+    header { grid-template-columns: 1fr; }
+    .header-right { text-align: left; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div>
+      <div class="header-tag">DevOps Pipeline · DORA Metrics · Q1 2026</div>
+      <h1>Engineering<br><em>Velocity</em> Report</h1>
+      <div class="header-sub">
+        NAM eCommerce · DevOps & SRE Unit · Bogotá Regional Hub<br>
+        Period: January 01 — March 31, 2026 · 12 services tracked
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="elite-badge">
+        <div class="elite-label">● DORA Rating</div>
+        <div class="elite-value">Elite</div>
+        <div class="elite-sub">Top 10% globally · ↑ from High</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- DORA 4 METRICS -->
+  <div class="sec-label">// The Four DORA Metrics</div>
+  <div class="dora-grid">
+
+    <div class="dora-card elite">
+      <div class="dora-num">01 / 04</div>
+      <div class="dora-metric">Deployment Frequency</div>
+      <div class="dora-value" style="color:var(--green)">8.4<span class="dora-unit">×/wk</span></div>
+      <div class="dora-label" style="color:var(--text2)">avg across all services</div>
+      <div class="dora-benchmark bench-elite">★ Elite · &gt;1×/day</div>
+      <div class="dora-trend">↑ +2.1× vs Q4 2025</div>
+    </div>
+
+    <div class="dora-card high">
+      <div class="dora-num">02 / 04</div>
+      <div class="dora-metric">Lead Time for Changes</div>
+      <div class="dora-value" style="color:var(--accent)">5.2<span class="dora-unit">hrs</span></div>
+      <div class="dora-label" style="color:var(--text2)">commit → production avg</div>
+      <div class="dora-benchmark bench-high">◆ High · 1d – 1wk</div>
+      <div class="dora-trend">↓ -2.3hrs vs Q4 2025</div>
+    </div>
+
+    <div class="dora-card elite">
+      <div class="dora-num">03 / 04</div>
+      <div class="dora-metric">Change Failure Rate</div>
+      <div class="dora-value" style="color:var(--green)">3.8<span class="dora-unit">%</span></div>
+      <div class="dora-label" style="color:var(--text2)">deploys causing incidents</div>
+      <div class="dora-benchmark bench-elite">★ Elite · &lt;5%</div>
+      <div class="dora-trend">↓ -1.4% vs Q4 2025</div>
+    </div>
+
+    <div class="dora-card elite">
+      <div class="dora-num">04 / 04</div>
+      <div class="dora-metric">Time to Restore</div>
+      <div class="dora-value" style="color:var(--green)">23<span class="dora-unit">min</span></div>
+      <div class="dora-label" style="color:var(--text2)">mean time to restore service</div>
+      <div class="dora-benchmark bench-elite">★ Elite · &lt;1hr</div>
+      <div class="dora-trend">↓ -8min vs Q4 2025</div>
+    </div>
+
+  </div>
+
+  <!-- TREND CHARTS -->
+  <div class="trends-section">
+    <div class="sec-label">// Monthly Trends — Q1 2026</div>
+    <div class="trends-grid">
+
+      <!-- Deploy Frequency by month -->
+      <div class="chart-card">
+        <div class="chart-title">Deployment Frequency</div>
+        <div class="chart-sub">Total deploys per month · all 12 services combined</div>
+        <div class="bar-group">
+          <div class="bar-row">
+            <span class="bar-month">JAN</span>
+            <div class="bar-track"><div class="bar-fill" data-w="72" style="background:var(--green)">248</div></div>
+            <span class="bar-val">248</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-month">FEB</span>
+            <div class="bar-track"><div class="bar-fill" data-w="85" style="background:var(--green)">291</div></div>
+            <span class="bar-val">291</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-month">MAR</span>
+            <div class="bar-track"><div class="bar-fill" data-w="100" style="background:var(--accent)">341</div></div>
+            <span class="bar-val">341</span>
+          </div>
+        </div>
+        <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--border); font-family:var(--font-mono); font-size:11px; color:var(--text2);">
+          Total Q1: <span style="color:var(--green); font-weight:700;">880 deploys</span> · ↑ +38% vs Q4 2025
+        </div>
+      </div>
+
+      <!-- Lead Time trend -->
+      <div class="chart-card">
+        <div class="chart-title">Lead Time for Changes</div>
+        <div class="chart-sub">Average hours commit → production · monthly</div>
+        <div class="sparkline-wrap">
+          <svg viewBox="0 0 400 80" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="ltGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#58a6ff" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#58a6ff" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- Grid lines -->
+            <line x1="0" y1="20" x2="400" y2="20" stroke="#21262d" stroke-width="1"/>
+            <line x1="0" y1="40" x2="400" y2="40" stroke="#21262d" stroke-width="1"/>
+            <line x1="0" y1="60" x2="400" y2="60" stroke="#21262d" stroke-width="1"/>
+            <!-- Area fill -->
+            <path d="M0,60 L66,48 L133,42 L200,35 L266,28 L333,22 L400,16 L400,80 L0,80 Z" fill="url(#ltGrad)"/>
+            <!-- Line -->
+            <path d="M0,60 L66,48 L133,42 L200,35 L266,28 L333,22 L400,16" fill="none" stroke="#58a6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Dots -->
+            <circle cx="0" cy="60" r="4" fill="#58a6ff"/>
+            <circle cx="133" cy="42" r="4" fill="#58a6ff"/>
+            <circle cx="266" cy="28" r="4" fill="#58a6ff"/>
+            <circle cx="400" cy="16" r="4" fill="#3fb950"/>
+            <!-- Labels -->
+            <text x="0" y="74" font-family="IBM Plex Mono" font-size="9" fill="#8b949e">7.5h</text>
+            <text x="118" y="36" font-family="IBM Plex Mono" font-size="9" fill="#8b949e">6.8h</text>
+            <text x="251" y="22" font-family="IBM Plex Mono" font-size="9" fill="#8b949e">5.8h</text>
+            <text x="372" y="10" font-family="IBM Plex Mono" font-size="9" fill="#3fb950">5.2h</text>
+          </svg>
+        </div>
+        <div class="spark-labels">
+          <span>Jan W1</span><span>Jan W3</span><span>Feb W2</span><span>Feb W4</span><span>Mar W1</span><span>Mar W3</span><span>Mar W5</span>
+        </div>
+      </div>
+
+      <!-- Change Failure Rate -->
+      <div class="chart-card">
+        <div class="chart-title">Change Failure Rate</div>
+        <div class="chart-sub">% of deployments that caused a production incident</div>
+        <div class="bar-group">
+          <div class="bar-row">
+            <span class="bar-month">JAN</span>
+            <div class="bar-track"><div class="bar-fill" data-w="52" style="background:var(--yellow)">5.2%</div></div>
+            <span class="bar-val">5.2%</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-month">FEB</span>
+            <div class="bar-track"><div class="bar-fill" data-w="40" style="background:var(--yellow)">4.1%</div></div>
+            <span class="bar-val">4.1%</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-month">MAR</span>
+            <div class="bar-track"><div class="bar-fill" data-w="20" style="background:var(--green)">2.0%</div></div>
+            <span class="bar-val">2.0%</span>
+          </div>
+        </div>
+        <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--border); font-family:var(--font-mono); font-size:11px; color:var(--text2);">
+          Q1 avg: <span style="color:var(--green); font-weight:700;">3.8%</span> · ↓ -1.4% vs Q4 · Target: &lt;5%
+        </div>
+      </div>
+
+      <!-- MTTR trend -->
+      <div class="chart-card">
+        <div class="chart-title">Time to Restore (MTTR)</div>
+        <div class="chart-sub">Mean minutes to restore service after incident · monthly</div>
+        <div class="sparkline-wrap">
+          <svg viewBox="0 0 400 80" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="mttrGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#3fb950" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="#3fb950" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <line x1="0" y1="20" x2="400" y2="20" stroke="#21262d" stroke-width="1"/>
+            <line x1="0" y1="40" x2="400" y2="40" stroke="#21262d" stroke-width="1"/>
+            <line x1="0" y1="60" x2="400" y2="60" stroke="#21262d" stroke-width="1"/>
+            <path d="M0,20 L66,28 L133,35 L200,42 L266,50 L333,58 L400,65 L400,80 L0,80 Z" fill="url(#mttrGrad)"/>
+            <path d="M0,20 L66,28 L133,35 L200,42 L266,50 L333,58 L400,65" fill="none" stroke="#3fb950" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="0" cy="20" r="4" fill="#f85149"/>
+            <circle cx="200" cy="42" r="4" fill="#d29922"/>
+            <circle cx="400" cy="65" r="4" fill="#3fb950"/>
+            <text x="4" y="14" font-family="IBM Plex Mono" font-size="9" fill="#f85149">31min</text>
+            <text x="178" y="36" font-family="IBM Plex Mono" font-size="9" fill="#d29922">25min</text>
+            <text x="350" y="60" font-family="IBM Plex Mono" font-size="9" fill="#3fb950">19min</text>
+          </svg>
+        </div>
+        <div class="spark-labels">
+          <span>Jan W1</span><span>Jan W3</span><span>Feb W2</span><span>Feb W4</span><span>Mar W1</span><span>Mar W3</span><span>Mar W5</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PIPELINE BY SERVICE -->
+  <div class="pipeline-section">
+    <div class="sec-label">// Pipeline Performance by Service</div>
+    <table class="pipe-table">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Deploy Freq</th>
+          <th>Lead Time</th>
+          <th>Failure Rate</th>
+          <th>MTTR</th>
+          <th>Test Coverage</th>
+          <th>DORA Level</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="service-name">Checkout Service</span><span class="service-tech">Node.js · AWS EKS</span></td>
+          <td><span class="freq-badge freq-elite">★ 14×/wk</span></td>
+          <td>
+            <div class="mini-bar-wrap">
+              <div class="mini-track"><div class="mini-fill" data-w="30" style="background:var(--green)"></div></div>
+              <span class="mini-val">3.1h</span>
+            </div>
+          </td>
+          <td style="color:var(--green)">2.1%</td>
+          <td style="color:var(--green)">18 min</td>
+          <td>
+            <div class="mini-bar-wrap">
+              <div class="mini-track"><div class="mini-fill" data-w="88" style="background:var(--green)"></div></div>
+              <span class="mini-val">88%</span>
+            </div>
+          </td>
+          <td><span style="color:var(--green)">★ Elite</span></td>
+        </tr>
+        <tr>
+          <td><span class="service-name">Product API</span><span class="service-tech">Python · AWS Lambda</span></td>
+          <td><span class="freq-badge freq-elite">★ 11×/wk</span></td>
+          <td>
+            <div class="mini-bar-wrap">
+              <div class="mini-track"><div class="mini-fill" data-w="38" style="background:var(--green)"></div></div>
+              <span class="mini-val">3.8h</span>
+            </div>
+          </td>
+          <td style="color:var(--green)">3.0%</td>
+          <td style="color:var(--green)">14 min</td>
+          <td>
+            <div class="mini-bar-wrap">
+              <div class="mini-track"><div class="mini-fill" data-w="82" style="background:var(--green)"></div></div>
+              <span class="mini-val">82%</span>
+            </div>
+          </td>
+          <td><span style="color:var(--green)">★ Elite</span></td>
+        </tr>
+        <tr>
+          <td><span class="service-name">Auth Service</span><span class="service-tech">Java · AWS ECS</span></td>
+          <td><span class="freq-badge freq-high">◆ 6×/wk</span></td>
+          <td>
+            <div class="mini-bar-wrap">
+              <div class="mini-track"><div class="mini-fill" data-w="55" style="background:var(--accent)"></div></div>
+              <span class="mini-val">5.5h</span>
+            </div>
+          </td>
+          <td style="color:var(--yellow)">5.8%</td>
+          <td style="color:var(--yellow)">28 min</td>
+          <td>
+            <div class="mini-bar-wrap">
+              <div class="mini-track"><div class="mini-fill" data-w="71" style="background:var(--yellow)"></div></div>
+              <span class="mini-val">71%</span>
+            </div>
+          </td>
+          <td><span style="color:var(--accent)">◆ High</span></td>
+        </tr>
+        <tr>
+          <td><span class="service-name">Inventory Service</span><span class="service-tech">Go · AWS EKS</span></td>
+          <td><span class="freq-badge freq-high">◆ 5×/wk</span></td>
+          <td>
+            <div class="mini-bar-wrap">
+              <div class="mini-track"><div class="mini-fill" data-w="70" style="background:var(--yellow)"></div></div>
+              <span class="mini-val">7.0h</span>
+            </div>
+          </td>
+          <td style="color:var(--red)">8.2%</td>
+          <td style="color:var(--red)">41 min</td>
+          <td>
+            <div class="mini-bar-wrap">
+              <div class="mini-track"><div class="mini-fill" data-w="58" style="background:var(--yellow)"></div></div>
+              <span class="mini-val">58%</span>
+            </div>
+          </td>
+          <td><span style="color:var(--yellow)">▲ Medium</span></td>
+        </tr>
+        <tr>
+          <td><span class="service-name">CDN / Assets</span><span class="service-tech">CloudFront · S3</span></td>
+          <td><span class="freq-badge freq-elite">★ 18×/wk</span></td>
+          <td>
+            <div class="mini-bar-wrap">
+              <div class="mini-track"><div class="mini-fill" data-w="18" style="background:var(--green)"></div></div>
+              <span class="mini-val">1.8h</span>
+            </div>
+          </td>
+          <td style="color:var(--green)">0.5%</td>
+          <td style="color:var(--green)">6 min</td>
+          <td>
+            <div class="mini-bar-wrap">
+              <div class="mini-track"><div class="mini-fill" data-w="95" style="background:var(--green)"></div></div>
+              <span class="mini-val">95%</span>
+            </div>
+          </td>
+          <td><span style="color:var(--green)">★ Elite</span></td>
+        </tr>
+        <tr>
+          <td><span class="service-name">Notification Svc</span><span class="service-tech">Python · SQS</span></td>
+          <td><span class="freq-badge freq-high">◆ 7×/wk</span></td>
+          <td>
+            <div class="mini-bar-wrap">
+              <div class="mini-track"><div class="mini-fill" data-w="45" style="background:var(--accent)"></div></div>
+              <span class="mini-val">4.5h</span>
+            </div>
+          </td>
+          <td style="color:var(--green)">2.8%</td>
+          <td style="color:var(--green)">16 min</td>
+          <td>
+            <div class="mini-bar-wrap">
+              <div class="mini-track"><div class="mini-fill" data-w="76" style="background:var(--green)"></div></div>
+              <span class="mini-val">76%</span>
+            </div>
+          </td>
+          <td><span style="color:var(--accent)">◆ High</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CORRELATION STATS -->
+  <div class="correlation-section">
+    <div class="sec-label">// Pipeline Health Indicators</div>
+    <div class="corr-grid">
+      <div class="corr-card">
+        <div class="corr-label">Automated Test Pass Rate</div>
+        <div class="corr-value trend-up">96.4%</div>
+        <div class="corr-sub">↑ +3.2% vs Q4 · 1,847 test suites running in CI · Regression suite expanded Feb 10</div>
+      </div>
+      <div class="corr-card">
+        <div class="corr-label">Rollback Rate</div>
+        <div class="corr-value trend-up">2.1%</div>
+        <div class="corr-sub">↓ -0.8% vs Q4 · 18 rollbacks in Q1 · avg rollback time: 4.2 min · All automated</div>
+      </div>
+      <div class="corr-card">
+        <div class="corr-label">Pipeline Duration Avg</div>
+        <div class="corr-value trend-neutral">12.4<span style="font-size:16px; color:var(--text2)"> min</span></div>
+        <div class="corr-sub">↓ -3.1min vs Q4 · Build cache optimization shipped Mar 8 · Target: &lt;10 min Q2</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BENCHMARK MATRIX -->
+  <div class="benchmark-section">
+    <div class="sec-label">// DORA Industry Benchmark — Where We Stand</div>
+    <table class="bench-table">
+      <thead>
+        <tr>
+          <th>Performer Level</th>
+          <th>Deploy Frequency</th>
+          <th>Lead Time</th>
+          <th>Change Failure Rate</th>
+          <th>Time to Restore</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="dot-elite">★ Elite</td>
+          <td class="dot-elite">Multiple/day</td>
+          <td class="dot-elite">&lt; 1 hour</td>
+          <td class="dot-elite">&lt; 5%</td>
+          <td class="dot-elite">&lt; 1 hour</td>
+        </tr>
+        <tr class="our-row">
+          <td>→ NAM Team (Q1)</td>
+          <td>8.4×/week <span style="color:var(--green)">★</span></td>
+          <td>5.2 hours <span style="color:var(--accent)">◆</span></td>
+          <td>3.8% <span style="color:var(--green)">★</span></td>
+          <td>23 min <span style="color:var(--green)">★</span></td>
+        </tr>
+        <tr>
+          <td class="dot-high">◆ High</td>
+          <td class="dot-high">1×/day – 1×/wk</td>
+          <td class="dot-high">1 day – 1 week</td>
+          <td class="dot-high">5% – 10%</td>
+          <td class="dot-high">1h – 24h</td>
+        </tr>
+        <tr>
+          <td class="dot-medium">▲ Medium</td>
+          <td class="dot-medium">1×/wk – 1×/mo</td>
+          <td class="dot-medium">1 week – 1 month</td>
+          <td class="dot-medium">10% – 15%</td>
+          <td class="dot-medium">1 day – 1 week</td>
+        </tr>
+        <tr>
+          <td class="dot-low">● Low</td>
+          <td class="dot-low">&lt; 1×/month</td>
+          <td class="dot-low">&gt; 1 month</td>
+          <td class="dot-low">&gt; 15%</td>
+          <td class="dot-low">&gt; 1 week</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>Generated with <span>Claude AI</span> · NAM DevOps & SRE · Bogotá HQ · Q1 2026</div>
+    <div>DORA Research Framework · Confidential Internal Use</div>
+  </footer>
+
+</div>
+
+<script>
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.querySelectorAll('.bar-fill').forEach(el => {
+        el.style.width = (el.dataset.w || 0) + '%';
+      });
+      document.querySelectorAll('.mini-fill').forEach(el => {
+        el.style.width = (el.dataset.w || 0) + '%';
+      });
+    }, 400);
+  });
+</script>
+</body>
+</html>

@@ -590,9 +590,27 @@
     header { grid-template-columns: 1fr; }
     .header-right { text-align: left; }
   }
+
+  /* ── NAVBAR ── */
+  .navbar { position:sticky; top:0; z-index:100; background:rgba(7,9,15,0.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); padding:0 32px; height:52px; display:flex; align-items:center; justify-content:space-between; }
+  .nav-left { display:flex; align-items:center; gap:24px; }
+  .nav-home { display:flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:11px; color:var(--accent); text-decoration:none; letter-spacing:0.08em; padding:6px 12px; border:1px solid rgba(0,212,255,0.2); border-radius:4px; transition:background 0.2s; }
+  .nav-home:hover { background:rgba(0,212,255,0.08); }
+  .nav-sep { color:#30363d; font-size:14px; }
+  .nav-current { font-family:var(--font-mono); font-size:11px; color:var(--text2); letter-spacing:0.06em; }
+  .nav-right { font-family:var(--font-mono); font-size:10px; color:var(--text2); letter-spacing:0.1em; text-transform:uppercase; }
+  .nav-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--green); margin-right:6px; animation:pulse 2s infinite; }
 </style>
 </head>
 <body>
+<nav class="navbar">
+  <div class="nav-left">
+    <a href="index.html" class="nav-home">← Home</a>
+    <span class="nav-sep">/</span>
+    <span class="nav-current">DevOps &amp; DORA — Q1 2026</span>
+  </div>
+  <div class="nav-right"><span class="nav-dot"></span>Live Report</div>
+</nav>
 <div class="wrapper">
 
   <!-- HEADER -->

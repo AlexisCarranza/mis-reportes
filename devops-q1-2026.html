@@ -608,7 +608,7 @@
   <div class="nav-left">
     <a href="index.html" class="nav-home">← Home</a>
     <span class="nav-sep">/</span>
-    <span class="nav-current">DevOps &amp; DORA — Q1 2026</span>
+    <span id="nav-current" class="nav-current">DevOps &amp; DORA — Q1 2026</span>
   </div>
   <div class="nav-right"><span class="nav-dot"></span>Live Report</div>
 </nav>
@@ -617,11 +617,11 @@
   <!-- HEADER -->
   <header>
     <div>
-      <div class="header-tag">DevOps Pipeline · DORA Metrics · Q1 2026</div>
+      <div id="header-tag" class="header-tag">DevOps Pipeline · DORA Metrics · Q1 2026</div>
       <h1>Engineering<br><em>Velocity</em> Report</h1>
       <div class="header-sub">
         NAM eCommerce · DevOps & SRE Unit · Bogotá Regional Hub<br>
-        Period: January 01 — March 31, 2026 · 12 services tracked
+        Period: <span id="period-text">January 01 — March 31, 2026</span> · 12 services tracked
       </div>
       <div style="margin-top: 16px;">
         <label for="quarter-select" style="font-family: var(--font-mono); font-size: 11px; color: var(--text2); margin-right: 8px;">Select Quarter:</label>
@@ -631,6 +631,10 @@
           <option value="Q3 2025">Q3 2025</option>
           <option value="Q2 2025">Q2 2025</option>
           <option value="Q1 2025">Q1 2025</option>
+          <option value="Q4 2024">Q4 2024</option>
+          <option value="Q3 2024">Q3 2024</option>
+          <option value="Q2 2024">Q2 2024</option>
+          <option value="Q1 2024">Q1 2024</option>
         </select>
       </div>
     </div>
@@ -1050,7 +1054,49 @@
       const avgMttr = metricsData.reduce((sum, row) => sum + row.mttr_avg_min, 0) / metricsData.length;
       const doraLevel = metricsData[metricsData.length - 1]?.dora_level || 'Unknown';
 
-      // Update deploy numbers (assuming JAN, FEB, MAR order for quarters)
+      // Update month labels based on quarter
+      const monthLabels = {
+        'Q1': ['JAN', 'FEB', 'MAR'],
+        'Q2': ['APR', 'MAY', 'JUN'],
+        'Q3': ['JUL', 'AUG', 'SEP'],
+        'Q4': ['OCT', 'NOV', 'DEC']
+      };
+      const quarterKey = selectedQuarter.split(' ')[0];
+      const labels = monthLabels[quarterKey];
+      const monthElements = document.querySelectorAll('.bar-month');
+      labels.forEach((label, index) => {
+        if (monthElements[index]) {
+          monthElements[index].textContent = label;
+        }
+      });
+
+      // Update period text
+      const periodTexts = {
+        'Q1': 'January 01 — March 31',
+        'Q2': 'April 01 — June 30',
+        'Q3': 'July 01 — September 30',
+        'Q4': 'October 01 — December 31'
+      };
+      const year = selectedQuarter.split(' ')[1];
+      const periodElement = document.getElementById('period-text');
+      if (periodElement) {
+        periodElement.textContent = `${periodTexts[quarterKey]}, ${year}`;
+      }
+
+      // Update header tag
+      const headerTagElement = document.getElementById('header-tag');
+      if (headerTagElement) {
+        headerTagElement.textContent = `DevOps Pipeline · DORA Metrics · ${selectedQuarter}`;
+      }
+
+      // Update nav current
+      const navCurrentElement = document.getElementById('nav-current');
+      if (navCurrentElement) {
+        navCurrentElement.textContent = `DevOps & DORA — ${selectedQuarter}`;
+      }
+
+      // Update document title
+      document.title = `DevOps Pipeline & DORA Metrics — ${selectedQuarter}`;
       const allBarVals = document.querySelectorAll('.bar-val');
       const deployVals = Array.from(allBarVals).slice(0, 3);
       const failureVals = Array.from(allBarVals).slice(3, 6);

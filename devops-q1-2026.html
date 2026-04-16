@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DevOps Pipeline & DORA Metrics — Q1 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Barlow:wght@300;400;600;800&display=swap" rel="stylesheet">
+<script src="js/csv-loader.js"></script>
 <style>
   :root {
     --bg: #07090f;
@@ -622,11 +623,21 @@
         NAM eCommerce · DevOps & SRE Unit · Bogotá Regional Hub<br>
         Period: January 01 — March 31, 2026 · 12 services tracked
       </div>
+      <div style="margin-top: 16px;">
+        <label for="quarter-select" style="font-family: var(--font-mono); font-size: 11px; color: var(--text2); margin-right: 8px;">Select Quarter:</label>
+        <select id="quarter-select" style="background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 4px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px;">
+          <option value="Q1 2026">Q1 2026</option>
+          <option value="Q4 2025">Q4 2025</option>
+          <option value="Q3 2025">Q3 2025</option>
+          <option value="Q2 2025">Q2 2025</option>
+          <option value="Q1 2025">Q1 2025</option>
+        </select>
+      </div>
     </div>
     <div class="header-right">
       <div class="elite-badge">
         <div class="elite-label">● DORA Rating</div>
-        <div class="elite-value">Elite</div>
+        <div id="dora-level" class="elite-value">Elite</div>
         <div class="elite-sub">Top 10% globally · ↑ from High</div>
       </div>
     </div>
@@ -701,7 +712,7 @@
           </div>
         </div>
         <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--border); font-family:var(--font-mono); font-size:11px; color:var(--text2);">
-          Total Q1: <span style="color:var(--green); font-weight:700;">880 deploys</span> · ↑ +38% vs Q4 2025
+          Total Q1: <span id="total-deploys" style="color:var(--green); font-weight:700;">880 deploys</span> · ↑ +38% vs Q4 2025
         </div>
       </div>
 
@@ -764,7 +775,7 @@
           </div>
         </div>
         <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--border); font-family:var(--font-mono); font-size:11px; color:var(--text2);">
-          Q1 avg: <span style="color:var(--green); font-weight:700;">3.8%</span> · ↓ -1.4% vs Q4 · Target: &lt;5%
+          Q1 avg: <span id="failure-rate" style="color:var(--green); font-weight:700;">3.8%</span> · ↓ -1.4% vs Q4 · Target: &lt;5%
         </div>
       </div>
 
@@ -1019,15 +1030,85 @@
 </div>
 
 <script>
+  // Load metrics data and update the report
+  async function loadAndUpdateMetrics(selectedQuarter = 'Q1 2026') {
+    try {
+      const data = await window.CSVLoader.loadMetrics('data/nam_devops_metrics_2024_2026.csv');
+
+      // Filter for selected quarter
+      const metricsData = data.filter(row => row.quarter === selectedQuarter);
+
+      if (metricsData.length === 0) {
+        throw new Error(`No data found for ${selectedQuarter}`);
+      }
+
+      // Calculate aggregates
+      const totalDeploys = metricsData.reduce((sum, row) => sum + row.total_deploys_month, 0);
+      const avgFailureRate = metricsData.reduce((sum, row) => sum + row.change_failure_rate_pct, 0) / metricsData.length;
+      const avgLeadTime = metricsData.reduce((sum, row) => sum + row.lead_time_hrs, 0) / metricsData.length;
+      const avgMttr = metricsData.reduce((sum, row) => sum + row.mttr_avg_min, 0) / metricsData.length;
+      const doraLevel = metricsData[metricsData.length - 1]?.dora_level || 'Unknown';
+
+      // Update deploy numbers (assuming JAN, FEB, MAR order for quarters)
+      const deployElements = document.querySelectorAll('.bar-val');
+      metricsData.forEach((row, index) => {
+        if (deployElements[index]) {
+          deployElements[index].textContent = row.total_deploys_month;
+        }
+      });
+
+      // Update total deploys
+      const totalElement = document.getElementById('total-deploys');
+      if (totalElement) {
+        totalElement.textContent = `${totalDeploys} deploys`;
+      }
+
+      // Update failure rate
+      const failureElement = document.getElementById('failure-rate');
+      if (failureElement) {
+        failureElement.textContent = `${avgFailureRate.toFixed(1)}%`;
+      }
+
+      // Update DORA level
+      const doraElement = document.getElementById('dora-level');
+      if (doraElement) {
+        doraElement.textContent = doraLevel;
+      }
+
+      console.log(`Metrics updated for ${selectedQuarter}`);
+
+    } catch (error) {
+      console.error('Failed to load metrics:', error);
+      // Fallback: show error message
+      const errorMsg = document.createElement('div');
+      errorMsg.style.cssText = 'position:fixed; top:20px; right:20px; background:#f85149; color:white; padding:10px; border-radius:4px; z-index:1000;';
+      errorMsg.textContent = `Error loading data for ${selectedQuarter}. Using cached values.`;
+      document.body.appendChild(errorMsg);
+      setTimeout(() => errorMsg.remove(), 5000);
+    }
+  }
+
   window.addEventListener('load', () => {
-    setTimeout(() => {
-      document.querySelectorAll('.bar-fill').forEach(el => {
-        el.style.width = (el.dataset.w || 0) + '%';
+    // Load initial data
+    loadAndUpdateMetrics().then(() => {
+      // Then animate bars
+      setTimeout(() => {
+        document.querySelectorAll('.bar-fill').forEach(el => {
+          el.style.width = (el.dataset.w || 0) + '%';
+        });
+        document.querySelectorAll('.mini-fill').forEach(el => {
+          el.style.width = (el.dataset.w || 0) + '%';
+        });
+      }, 400);
+    });
+
+    // Add event listener for quarter select
+    const quarterSelect = document.getElementById('quarter-select');
+    if (quarterSelect) {
+      quarterSelect.addEventListener('change', (e) => {
+        loadAndUpdateMetrics(e.target.value);
       });
-      document.querySelectorAll('.mini-fill').forEach(el => {
-        el.style.width = (el.dataset.w || 0) + '%';
-      });
-    }, 400);
+    }
   });
 </script>
 </body>

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SRE Command Center — NAM eCommerce Q1 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="js/csv-loader.js"></script>
 <style>
   :root {
     --bg: #07090f; --surface: #0d1117; --surface2: #161b22; --surface3: #1c2230;
@@ -285,16 +286,69 @@
 </div>
 
 <script>
+  // Load SRE metrics data and update the report
+  async function loadAndUpdateSREMetrics(selectedQuarter = 'Q1 2026') {
+    try {
+      const data = await window.CSVLoader.loadMetrics('data/nam_devops_metrics_2024_2026.csv');
+
+      // Filter for selected quarter
+      const metricsData = data.filter(row => row.quarter === selectedQuarter);
+
+      if (metricsData.length === 0) {
+        throw new Error(`No data found for ${selectedQuarter}`);
+      }
+
+      // Calculate averages for SLOs and availability
+      const avgCheckoutAvail = metricsData.reduce((sum, row) => sum + row.slo_checkout_avail_pct, 0) / metricsData.length;
+      const avgApiResponse = metricsData.reduce((sum, row) => sum + row.slo_api_response_pct, 0) / metricsData.length;
+      const avgInventoryAvail = metricsData.reduce((sum, row) => sum + row.slo_inventory_avail_pct, 0) / metricsData.length;
+      const avgAuthSuccess = metricsData.reduce((sum, row) => sum + row.slo_auth_success_pct, 0) / metricsData.length;
+      const avgErrorRate = metricsData.reduce((sum, row) => sum + row.slo_error_rate_pct, 0) / metricsData.length;
+
+      // Update SLO percentages (assuming order: checkout, api, inventory, auth, error)
+      const sloElements = document.querySelectorAll('.slo-pct');
+      const sloValues = [avgCheckoutAvail, avgApiResponse, avgInventoryAvail, avgAuthSuccess, avgErrorRate];
+      sloElements.forEach((el, index) => {
+        if (sloValues[index] !== undefined) {
+          el.textContent = `${sloValues[index].toFixed(2)}%`;
+        }
+      });
+
+      // Update SLO fills
+      document.querySelectorAll('.slo-fill').forEach((fill, index) => {
+        if (sloValues[index] !== undefined) {
+          fill.style.width = `${sloValues[index]}%`;
+          fill.dataset.w = sloValues[index];
+        }
+      });
+
+      console.log(`SRE metrics updated for ${selectedQuarter}`);
+
+    } catch (error) {
+      console.error('Failed to load SRE metrics:', error);
+      // Fallback: show error message
+      const errorMsg = document.createElement('div');
+      errorMsg.style.cssText = 'position:fixed; top:20px; right:20px; background:#f85149; color:white; padding:10px; border-radius:4px; z-index:1000;';
+      errorMsg.textContent = `Error loading SRE data for ${selectedQuarter}. Using cached values.`;
+      document.body.appendChild(errorMsg);
+      setTimeout(() => errorMsg.remove(), 5000);
+    }
+  }
+
   window.addEventListener('load', () => {
-    setTimeout(() => {
-      document.querySelectorAll('.bar-fill').forEach(bar => {
-        const w = parseFloat(bar.dataset.w);
-        bar.style.width = Math.max(0,((w-97)/3)*100) + '%';
-      });
-      document.querySelectorAll('.slo-fill').forEach(bar => {
-        bar.style.width = parseFloat(bar.dataset.w) + '%';
-      });
-    }, 300);
+    // Load initial data
+    loadAndUpdateSREMetrics().then(() => {
+      // Then animate bars
+      setTimeout(() => {
+        document.querySelectorAll('.bar-fill').forEach(bar => {
+          const w = parseFloat(bar.dataset.w);
+          bar.style.width = Math.max(0,((w-97)/3)*100) + '%';
+        });
+        document.querySelectorAll('.slo-fill').forEach(bar => {
+          bar.style.width = parseFloat(bar.dataset.w) + '%';
+        });
+      }, 300);
+    });
   });
 </script>
 </body>

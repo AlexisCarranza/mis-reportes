@@ -1037,6 +1037,7 @@
 
       // Filter for selected quarter
       const metricsData = data.filter(row => row.quarter === selectedQuarter);
+      console.log(`Filtered data for ${selectedQuarter}:`, metricsData.length, 'rows');
 
       if (metricsData.length === 0) {
         throw new Error(`No data found for ${selectedQuarter}`);

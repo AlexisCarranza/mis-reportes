@@ -9,16 +9,23 @@
  * @returns {Promise<string>} CSV text content
  */
 async function fetchCSV(url) {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return await response.text();
-    } catch (error) {
-        console.error('Error fetching CSV:', error);
-        throw error;
-    }
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    resolve(xhr.responseText);
+                } else {
+                    reject(new Error(`HTTP error! status: ${xhr.status}`));
+                }
+            }
+        };
+        xhr.onerror = function() {
+            reject(new Error('Network error'));
+        };
+        xhr.send();
+    });
 }
 
 /**

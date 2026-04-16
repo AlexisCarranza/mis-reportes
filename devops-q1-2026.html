@@ -1051,10 +1051,33 @@
       const doraLevel = metricsData[metricsData.length - 1]?.dora_level || 'Unknown';
 
       // Update deploy numbers (assuming JAN, FEB, MAR order for quarters)
-      const deployElements = document.querySelectorAll('.bar-val');
+      const allBarVals = document.querySelectorAll('.bar-val');
+      const deployVals = Array.from(allBarVals).slice(0, 3);
+      const failureVals = Array.from(allBarVals).slice(3, 6);
       metricsData.forEach((row, index) => {
-        if (deployElements[index]) {
-          deployElements[index].textContent = row.total_deploys_month;
+        if (deployVals[index]) {
+          deployVals[index].textContent = row.total_deploys_month;
+        }
+        if (failureVals[index]) {
+          failureVals[index].textContent = (row.change_failure_rate_pct * 100).toFixed(1) + '%';
+        }
+      });
+
+      // Update bar fills data-w
+      const allBarFills = document.querySelectorAll('.bar-fill');
+      const deployFills = Array.from(allBarFills).slice(0, 3);
+      const failureFills = Array.from(allBarFills).slice(3, 6);
+      metricsData.forEach((row, index) => {
+        if (deployFills[index]) {
+          // Normalize deploy numbers to percentage (assuming max ~200)
+          const pct = Math.round((row.total_deploys_month / 200) * 100);
+          deployFills[index].dataset.w = pct;
+          deployFills[index].textContent = row.total_deploys_month;
+        }
+        if (failureFills[index]) {
+          const pct = Math.round(row.change_failure_rate_pct * 1000);
+          failureFills[index].dataset.w = pct;
+          failureFills[index].textContent = (row.change_failure_rate_pct * 100).toFixed(1) + '%';
         }
       });
 
@@ -1107,7 +1130,17 @@
     const quarterSelect = document.getElementById('quarter-select');
     if (quarterSelect) {
       quarterSelect.addEventListener('change', (e) => {
-        loadAndUpdateMetrics(e.target.value);
+        loadAndUpdateMetrics(e.target.value).then(() => {
+          // Re-animate bars after data update
+          setTimeout(() => {
+            document.querySelectorAll('.bar-fill').forEach(el => {
+              el.style.width = (el.dataset.w || 0) + '%';
+            });
+            document.querySelectorAll('.mini-fill').forEach(el => {
+              el.style.width = (el.dataset.w || 0) + '%';
+            });
+          }, 400);
+        });
       });
     }
   });

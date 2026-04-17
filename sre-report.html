@@ -140,7 +140,7 @@
   <div class="nav-left">
     <a href="index.html" class="nav-home">← Home</a>
     <span class="nav-sep">/</span>
-    <span class="nav-current">SRE Metrics — Q1 2026</span>
+    <span id="nav-current-sre" class="nav-current">SRE Metrics — Q1 2026</span>
   </div>
   <div class="nav-right"><span class="nav-dot"></span>Live Report</div>
 </nav>
@@ -151,9 +151,23 @@
       <div class="badge">● Live Report</div>
       <h1>SRE Command Center<br><span>NAM eCommerce</span></h1>
       <p class="subtitle">// Q1 2026 — Bogotá Regional Hub</p>
+      <div style="margin-top: 16px;">
+        <label for="quarter-select-sre" style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-right: 8px;">Select Quarter:</label>
+        <select id="quarter-select-sre" style="background: var(--surface); border: 1px solid rgba(0,212,255,0.2); color: var(--text); padding: 4px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px;">
+          <option value="Q1 2026">Q1 2026</option>
+          <option value="Q4 2025">Q4 2025</option>
+          <option value="Q3 2025">Q3 2025</option>
+          <option value="Q2 2025">Q2 2025</option>
+          <option value="Q1 2025">Q1 2025</option>
+          <option value="Q4 2024">Q4 2024</option>
+          <option value="Q3 2024">Q3 2024</option>
+          <option value="Q2 2024">Q2 2024</option>
+          <option value="Q1 2024">Q1 2024</option>
+        </select>
+      </div>
     </div>
     <div class="header-right">
-      <strong>Period</strong>Jan 01 – Mar 31, 2026<br>
+      <strong>Period</strong><span id="period-text-sre">Jan 01 – Mar 31, 2026</span><br>
       <strong>Region</strong>NAM + Caribbean<br>
       <strong>Generated</strong>March 31, 2026<br>
       <strong>Team</strong>DevOps & SRE Unit
@@ -305,22 +319,67 @@
       const avgAuthSuccess = metricsData.reduce((sum, row) => sum + row.slo_auth_success_pct, 0) / metricsData.length;
       const avgErrorRate = metricsData.reduce((sum, row) => sum + row.slo_error_rate_pct, 0) / metricsData.length;
 
+      // Update health cards (assuming order: availability, incidents, mttr, slo compliance)
+      const healthCards = document.querySelectorAll('.health-card');
+      if (healthCards.length >= 4) {
+        // Avg Availability
+        const availElement = healthCards[0].querySelector('.hc-value');
+        if (availElement) availElement.textContent = `${((avgCheckoutAvail + avgApiResponse + avgInventoryAvail + avgAuthSuccess) / 4 * 100).toFixed(2)}%`;
+
+        // Total Incidents (sum of all incident types)
+        const incidentsElement = healthCards[1].querySelector('.hc-value');
+        const totalIncidents = metricsData.reduce((sum, row) => sum + row.incidents_total, 0);
+        if (incidentsElement) incidentsElement.textContent = totalIncidents;
+
+        // Avg MTTR
+        const mttrElement = healthCards[2].querySelector('.hc-value');
+        const avgMttr = metricsData.reduce((sum, row) => sum + row.mttr_avg_min, 0) / metricsData.length;
+        if (mttrElement) mttrElement.innerHTML = `${avgMttr.toFixed(0)}<span style="font-size:16px">min</span>`;
+
+        // SLO Compliance
+        const sloElement = healthCards[3].querySelector('.hc-value');
+        const avgSloCompliance = (avgCheckoutAvail + avgApiResponse + avgInventoryAvail + avgAuthSuccess) / 4 * 100;
+        if (sloElement) sloElement.textContent = `${avgSloCompliance.toFixed(1)}%`;
+      }
+
       // Update SLO percentages (assuming order: checkout, api, inventory, auth, error)
       const sloElements = document.querySelectorAll('.slo-pct');
       const sloValues = [avgCheckoutAvail, avgApiResponse, avgInventoryAvail, avgAuthSuccess, avgErrorRate];
       sloElements.forEach((el, index) => {
         if (sloValues[index] !== undefined) {
-          el.textContent = `${sloValues[index].toFixed(2)}%`;
+          el.textContent = `${(sloValues[index] * 100).toFixed(2)}%`;
         }
       });
 
       // Update SLO fills
       document.querySelectorAll('.slo-fill').forEach((fill, index) => {
         if (sloValues[index] !== undefined) {
-          fill.style.width = `${sloValues[index]}%`;
-          fill.dataset.w = sloValues[index];
+          fill.style.width = `${sloValues[index] * 100}%`;
+          fill.dataset.w = sloValues[index] * 100;
         }
       });
+
+      // Update period text
+      const periodTexts = {
+        'Q1': 'Jan 01 – Mar 31',
+        'Q2': 'Apr 01 – Jun 30',
+        'Q3': 'Jul 01 – Sep 30',
+        'Q4': 'Oct 01 – Dec 31'
+      };
+      const year = selectedQuarter.split(' ')[1];
+      const periodElement = document.getElementById('period-text-sre');
+      if (periodElement) {
+        periodElement.textContent = `${periodTexts[selectedQuarter.split(' ')[0]]}, ${year}`;
+      }
+
+      // Update nav current
+      const navCurrentElement = document.getElementById('nav-current-sre');
+      if (navCurrentElement) {
+        navCurrentElement.textContent = `SRE Metrics — ${selectedQuarter}`;
+      }
+
+      // Update document title
+      document.title = `SRE Command Center — ${selectedQuarter}`;
 
       console.log(`SRE metrics updated for ${selectedQuarter}`);
 
@@ -349,6 +408,25 @@
         });
       }, 300);
     });
+
+    // Add event listener for quarter select
+    const quarterSelect = document.getElementById('quarter-select-sre');
+    if (quarterSelect) {
+      quarterSelect.addEventListener('change', (e) => {
+        loadAndUpdateSREMetrics(e.target.value).then(() => {
+          // Re-animate bars after data update
+          setTimeout(() => {
+            document.querySelectorAll('.bar-fill').forEach(bar => {
+              const w = parseFloat(bar.dataset.w);
+              bar.style.width = Math.max(0,((w-97)/3)*100) + '%';
+            });
+            document.querySelectorAll('.slo-fill').forEach(bar => {
+              bar.style.width = parseFloat(bar.dataset.w) + '%';
+            });
+          }, 300);
+        });
+      });
+    }
   });
 </script>
 </body>

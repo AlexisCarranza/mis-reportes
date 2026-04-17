@@ -634,7 +634,7 @@
           <option value="Q4 2024">Q4 2024</option>
           <option value="Q3 2024">Q3 2024</option>
           <option value="Q2 2024">Q2 2024</option>
-          <option value="Q1 2024">Q1 2024</option>
+          <option value="Q1 2024" selected>Q1 2024</option>
         </select>
       </div>
     </div>
@@ -1054,7 +1054,8 @@
 
 <script>
   // Load metrics data and update the report
-  async function loadAndUpdateMetrics(selectedQuarter = 'Q1 2026') {
+  async function loadAndUpdateMetrics(selectedQuarter = 'Q1 2024') {
+    console.log('Starting loadAndUpdateMetrics for', selectedQuarter);
     try {
       const data = await window.CSVLoader.loadMetrics('data/nam_devops_metrics_2024_2026.csv');
 
@@ -1066,12 +1067,30 @@
         throw new Error(`No data found for ${selectedQuarter}`);
       }
 
-      // Calculate aggregates
-      const totalDeploys = metricsData.reduce((sum, row) => sum + row.total_deploys_month, 0);
+      // Calculate aggregates using correct column names
+      const avgDeploymentFreq = metricsData.reduce((sum, row) => sum + row.deploy_freq_per_week, 0) / metricsData.length;
       const avgFailureRate = metricsData.reduce((sum, row) => sum + row.change_failure_rate_pct, 0) / metricsData.length;
       const avgLeadTime = metricsData.reduce((sum, row) => sum + row.lead_time_hrs, 0) / metricsData.length;
       const avgMttr = metricsData.reduce((sum, row) => sum + row.mttr_avg_min, 0) / metricsData.length;
       const doraLevel = metricsData[metricsData.length - 1]?.dora_level || 'Unknown';
+
+      console.log(`Quarter ${selectedQuarter}: Deploy Freq ${avgDeploymentFreq.toFixed(2)}, Failure ${avgFailureRate.toFixed(2)}, Lead Time ${avgLeadTime.toFixed(2)}, MTTR ${avgMttr.toFixed(2)}, Level ${doraLevel}`);
+
+      // Update DORA metrics cards
+      const doraValues = document.querySelectorAll('.dora-value');
+      if (doraValues.length >= 4) {
+        doraValues[0].innerHTML = `${avgDeploymentFreq.toFixed(1)}<span class="dora-unit">×/wk</span>`;
+        doraValues[1].innerHTML = `${avgLeadTime.toFixed(1)}<span class="dora-unit">hrs</span>`;
+        doraValues[2].innerHTML = `${avgFailureRate.toFixed(1)}<span class="dora-unit">%</span>`;
+        doraValues[3].innerHTML = `${avgMttr.toFixed(1)}<span class="dora-unit">min</span>`;
+      }
+
+      // Update DORA rating
+      const doraRating = doraLevel; // Use the dora_level from CSV
+      const ratingElement = document.querySelector('.dora-rating');
+      if (ratingElement) {
+        ratingElement.innerHTML = doraRating === 'Elite' ? '★ Elite' : doraRating === 'High' ? '◆ High' : doraRating === 'Medium' ? '▲ Medium' : '▼ Low';
+      }
 
       // Update month labels based on quarter
       const monthLabels = {
@@ -1258,7 +1277,50 @@
         card.className = `dora-card ${doraLevel.toLowerCase()}`;
       });
 
-      console.log(`Metrics updated for ${selectedQuarter}`);
+      // Update Pipeline Health Indicators
+      const avgTestPassRate = metricsData.reduce((sum, row) => sum + row.test_pass_rate_pct, 0) / metricsData.length;
+      const avgRollbackRate = metricsData.reduce((sum, row) => sum + row.rollback_rate_pct, 0) / metricsData.length;
+      const avgPipelineDuration = metricsData.reduce((sum, row) => sum + row.pipeline_duration_min, 0) / metricsData.length;
+
+      const corrCards = document.querySelectorAll('.corr-card .corr-value');
+      if (corrCards.length >= 3) {
+        corrCards[0].textContent = `${avgTestPassRate.toFixed(1)}%`; // Test Pass Rate
+        corrCards[1].textContent = `${avgRollbackRate.toFixed(1)}%`; // Rollback Rate
+        corrCards[2].innerHTML = `${avgPipelineDuration.toFixed(1)}<span style="font-size:16px; color:var(--text2)"> min</span>`; // Pipeline Duration
+      }
+
+      // Update Pipeline Performance Table
+      const tableRows = document.querySelectorAll('.data-table tbody tr');
+      if (tableRows.length >= 4) {
+        // Update values
+        tableRows[0].cells[1].textContent = `${avgDeploymentFreq.toFixed(1)}/week`;
+        tableRows[1].cells[1].textContent = `${avgLeadTime.toFixed(1)} hours`;
+        tableRows[2].cells[1].textContent = `${avgFailureRate.toFixed(1)}%`;
+        tableRows[3].cells[1].textContent = `${avgMttr.toFixed(1)} minutes`;
+
+        // Update status badges based on DORA levels
+        const getStatus = (value, metric) => {
+          if (metric === 'deployment') {
+            return value >= 1 ? 'status-good' : value >= 0.5 ? 'status-warning' : 'status-bad'; // per week
+          } else if (metric === 'leadtime') {
+            return value <= 24 ? 'status-good' : value <= 168 ? 'status-warning' : 'status-bad'; // hours
+          } else if (metric === 'failure') {
+            return value <= 15 ? 'status-good' : value <= 30 ? 'status-warning' : 'status-bad'; // percent
+          } else if (metric === 'mttr') {
+            return value <= 60 ? 'status-good' : value <= 240 ? 'status-warning' : 'status-bad'; // minutes
+          }
+          return 'status-warning';
+        };
+
+        const getSymbol = (status) => status === 'status-good' ? '✓' : status === 'status-warning' ? '⚠' : '✗';
+
+        tableRows[0].cells[3].innerHTML = `<span class="status-badge ${getStatus(avgDeploymentFreq, 'deployment')}">${getSymbol(getStatus(avgDeploymentFreq, 'deployment'))}</span>`;
+        tableRows[1].cells[3].innerHTML = `<span class="status-badge ${getStatus(avgLeadTime, 'leadtime')}">${getSymbol(getStatus(avgLeadTime, 'leadtime'))}</span>`;
+        tableRows[2].cells[3].innerHTML = `<span class="status-badge ${getStatus(avgFailureRate, 'failure')}">${getSymbol(getStatus(avgFailureRate, 'failure'))}</span>`;
+        tableRows[3].cells[3].innerHTML = `<span class="status-badge ${getStatus(avgMttr, 'mttr')}">${getSymbol(getStatus(avgMttr, 'mttr'))}</span>`;
+      }
+
+      console.log('Pipeline performance table updated');
 
     } catch (error) {
       console.error('Failed to load metrics:', error);

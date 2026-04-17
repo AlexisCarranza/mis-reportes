@@ -9,23 +9,33 @@
  * @returns {Promise<string>} CSV text content
  */
 async function fetchCSV(url) {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', url, true);
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    resolve(xhr.responseText);
-                } else {
-                    reject(new Error(`HTTP error! status: ${xhr.status}`));
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.text();
+    } catch (error) {
+        console.error('Fetch failed, trying XMLHttpRequest:', error);
+        // Fallback to XMLHttpRequest
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200 || xhr.status === 0) { // 0 for local files
+                        resolve(xhr.responseText);
+                    } else {
+                        reject(new Error(`XHR error! status: ${xhr.status}`));
+                    }
                 }
-            }
-        };
-        xhr.onerror = function() {
-            reject(new Error('Network error'));
-        };
-        xhr.send();
-    });
+            };
+            xhr.onerror = function() {
+                reject(new Error('Network error'));
+            };
+            xhr.send();
+        });
+    }
 }
 
 /**

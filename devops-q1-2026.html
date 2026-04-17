@@ -648,6 +648,25 @@
   </header>
 
   <!-- DORA 4 METRICS -->
+  <!-- DORA Legend -->
+  <div style="margin: 32px 0; padding: 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; font-family: var(--font-mono); font-size: 12px; color: var(--text2);">
+    <div style="font-weight: 600; color: var(--text); margin-bottom: 8px;">📊 DORA Performance Levels</div>
+    <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--green);"></div>
+        <span>Elite: Top 10% globally</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--accent);"></div>
+        <span>High: Above industry average</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--red);"></div>
+        <span>Medium/Low: Needs improvement</span>
+      </div>
+    </div>
+  </div>
+
   <div class="sec-label">// The Four DORA Metrics</div>
   <div class="dora-grid">
 
@@ -1139,11 +1158,105 @@
         failureElement.textContent = `${avgFailureRate.toFixed(1)}%`;
       }
 
+      // Calculate DORA metrics averages
+      const avgDeployFreq = metricsData.reduce((sum, row) => sum + row.deploy_freq_per_week, 0) / metricsData.length;
+      const avgLeadTime = metricsData.reduce((sum, row) => sum + row.lead_time_hrs, 0) / metricsData.length;
+      const avgFailureRate = metricsData.reduce((sum, row) => sum + row.change_failure_rate_pct, 0) / metricsData.length;
+      const avgMttr = metricsData.reduce((sum, row) => sum + row.mttr_avg_min, 0) / metricsData.length;
+
+      // Function to get DORA color
+      const getDoraColor = (metric, value) => {
+        switch(metric) {
+          case 'deploy':
+            return value >= 7 ? 'var(--green)' : value >= 1 ? 'var(--accent)' : 'var(--red)';
+          case 'lead':
+            return value <= 1 ? 'var(--green)' : value <= 7 ? 'var(--accent)' : 'var(--red)';
+          case 'failure':
+            return value <= 5 ? 'var(--green)' : value <= 15 ? 'var(--accent)' : 'var(--red)';
+          case 'mttr':
+            return value <= 60 ? 'var(--green)' : value <= 420 ? 'var(--accent)' : 'var(--red)';
+          default:
+            return 'var(--text)';
+        }
+      };
+
+      // Function to get benchmark
+      const getBenchmark = (metric, value) => {
+        switch(metric) {
+          case 'deploy':
+            if (value >= 7) return {class: 'bench-elite', text: '★ Elite · >1×/day'};
+            if (value >= 1) return {class: 'bench-high', text: '▲ High · 1×/wk-1×/day'};
+            return {class: 'bench-medium', text: '● Medium · 1×/mo-1×/wk'};
+          case 'lead':
+            if (value <= 1) return {class: 'bench-elite', text: '★ Elite · <1hr'};
+            if (value <= 7) return {class: 'bench-high', text: '▲ High · 1-7hrs'};
+            return {class: 'bench-medium', text: '● Medium · 1-6mo'};
+          case 'failure':
+            if (value <= 5) return {class: 'bench-elite', text: '★ Elite · <5%'};
+            if (value <= 15) return {class: 'bench-high', text: '▲ High · 5-15%'};
+            return {class: 'bench-medium', text: '● Medium · 15-45%'};
+          case 'mttr':
+            if (value <= 60) return {class: 'bench-elite', text: '★ Elite · <1hr'};
+            if (value <= 420) return {class: 'bench-high', text: '▲ High · 1-7hrs'};
+            return {class: 'bench-medium', text: '● Medium · 1-6mo'};
+          default:
+            return {class: 'bench-low', text: '● Low · >6mo'};
+        }
+      };
+
+      // Update DORA metric values and colors
+      const doraValues = document.querySelectorAll('.dora-value');
+      const doraBenchmarks = document.querySelectorAll('.dora-benchmark');
+      if (doraValues.length >= 4) {
+        // Deployment Frequency
+        doraValues[0].style.color = getDoraColor('deploy', avgDeployFreq);
+        doraValues[0].innerHTML = `${avgDeployFreq.toFixed(1)}<span class="dora-unit">×/wk</span>`;
+        if (doraBenchmarks[0]) {
+          const bench = getBenchmark('deploy', avgDeployFreq);
+          doraBenchmarks[0].className = `dora-benchmark ${bench.class}`;
+          doraBenchmarks[0].innerHTML = bench.text;
+        }
+
+        // Lead Time
+        doraValues[1].style.color = getDoraColor('lead', avgLeadTime);
+        doraValues[1].innerHTML = `${avgLeadTime.toFixed(1)}<span class="dora-unit">hrs</span>`;
+        if (doraBenchmarks[1]) {
+          const bench = getBenchmark('lead', avgLeadTime);
+          doraBenchmarks[1].className = `dora-benchmark ${bench.class}`;
+          doraBenchmarks[1].innerHTML = bench.text;
+        }
+
+        // Change Failure Rate
+        const failurePct = avgFailureRate * 100;
+        doraValues[2].style.color = getDoraColor('failure', failurePct);
+        doraValues[2].innerHTML = `${failurePct.toFixed(1)}<span class="dora-unit">%</span>`;
+        if (doraBenchmarks[2]) {
+          const bench = getBenchmark('failure', failurePct);
+          doraBenchmarks[2].className = `dora-benchmark ${bench.class}`;
+          doraBenchmarks[2].innerHTML = bench.text;
+        }
+
+        // MTTR
+        doraValues[3].style.color = getDoraColor('mttr', avgMttr);
+        doraValues[3].innerHTML = `${avgMttr.toFixed(1)}<span class="dora-unit">min</span>`;
+        if (doraBenchmarks[3]) {
+          const bench = getBenchmark('mttr', avgMttr);
+          doraBenchmarks[3].className = `dora-benchmark ${bench.class}`;
+          doraBenchmarks[3].innerHTML = bench.text;
+        }
+      }
+
       // Update DORA level
       const doraElement = document.getElementById('dora-level');
       if (doraElement) {
         doraElement.textContent = doraLevel;
       }
+
+      // Update DORA card classes
+      const doraCards = document.querySelectorAll('.dora-card');
+      doraCards.forEach(card => {
+        card.className = `dora-card ${doraLevel.toLowerCase()}`;
+      });
 
       console.log(`Metrics updated for ${selectedQuarter}`);
 

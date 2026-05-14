@@ -233,7 +233,7 @@
     <div class="section-title">// Major Incidents Log — Q1 2026</div>
     <div class="card" style="padding:0;overflow:hidden;">
       <table>
-        <thead><tr><th>ID</th><th>Date</th><th>System</th><th>Description</th><th>Severity</th><th>MTTR</th><th>Status</th></tr></thead>
+        <thead><tr><th>Month</th><th>Total</th><th>P1</th><th>P2</th><th>P3</th><th>MTTR</th><th>DORA Level</th><th>ID</th><th>Date</th><th>System</th><th>Description</th><th>Severity</th><th>MTTR</th><th>Status</th></tr></thead>
         <tbody>
           <tr><td style="color:var(--accent)">INC-0041</td><td>Jan 07</td><td>Checkout</td><td>Payment gateway timeout — US East</td><td><span class="sev-badge sev-p1">P1</span></td><td>34 min</td><td><span class="status-badge resolved">Resolved</span></td></tr>
           <tr><td style="color:var(--accent)">INC-0048</td><td>Jan 19</td><td>Inventory</td><td>DB replica lag exceeded threshold</td><td><span class="sev-badge sev-p2">P2</span></td><td>18 min</td><td><span class="status-badge resolved">Resolved</span></td></tr>
@@ -300,134 +300,227 @@
 </div>
 
 <script>
-  // Load SRE metrics data and update the report
-  async function loadAndUpdateSREMetrics(selectedQuarter = 'Q1 2026') {
-    try {
-      const data = await window.CSVLoader.loadMetrics('data/nam_devops_metrics_2024_2026.csv');
+// ═══════════════════════════════════════════════════════
+// SRE Report — Dynamic Data Engine
+// Usa: js/csv-loader.js (window.CSVLoader)
+// CSV: data/nam_devops_metrics_2024_2026.csv
+// ═══════════════════════════════════════════════════════
 
-      // Filter for selected quarter
-      const metricsData = data.filter(row => row.quarter === selectedQuarter);
+const CSV_PATH = 'data/nam_devops_metrics_2024_2026.csv';
 
-      if (metricsData.length === 0) {
-        throw new Error(`No data found for ${selectedQuarter}`);
-      }
+const MONTH_NAMES = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-      // Calculate averages for SLOs and availability
-      const avgCheckoutAvail = metricsData.reduce((sum, row) => sum + row.slo_checkout_avail_pct, 0) / metricsData.length;
-      const avgApiResponse = metricsData.reduce((sum, row) => sum + row.slo_api_response_pct, 0) / metricsData.length;
-      const avgInventoryAvail = metricsData.reduce((sum, row) => sum + row.slo_inventory_avail_pct, 0) / metricsData.length;
-      const avgAuthSuccess = metricsData.reduce((sum, row) => sum + row.slo_auth_success_pct, 0) / metricsData.length;
-      const avgErrorRate = metricsData.reduce((sum, row) => sum + row.slo_error_rate_pct, 0) / metricsData.length;
+const QUARTER_MONTHS = {
+  'Q1': [1, 2, 3],
+  'Q2': [4, 5, 6],
+  'Q3': [7, 8, 9],
+  'Q4': [10, 11, 12]
+};
 
-      // Update health cards (assuming order: availability, incidents, mttr, slo compliance)
-      const healthCards = document.querySelectorAll('.health-card');
-      if (healthCards.length >= 4) {
-        // Avg Availability
-        const availElement = healthCards[0].querySelector('.hc-value');
-        if (availElement) availElement.textContent = `${((avgCheckoutAvail + avgApiResponse + avgInventoryAvail + avgAuthSuccess) / 4 * 100).toFixed(2)}%`;
+const PERIOD_LABELS = {
+  'Q1': 'Jan – Mar',
+  'Q2': 'Apr – Jun',
+  'Q3': 'Jul – Sep',
+  'Q4': 'Oct – Dec'
+};
 
-        // Total Incidents (sum of all incident types)
-        const incidentsElement = healthCards[1].querySelector('.hc-value');
-        const totalIncidents = metricsData.reduce((sum, row) => sum + row.incidents_total, 0);
-        if (incidentsElement) incidentsElement.textContent = totalIncidents;
+// ── helpers ──
+const avg = (rows, key) => rows.reduce((s, r) => s + (r[key] || 0), 0) / rows.length;
+const sum = (rows, key) => rows.reduce((s, r) => s + (r[key] || 0), 0);
 
-        // Avg MTTR
-        const mttrElement = healthCards[2].querySelector('.hc-value');
-        const avgMttr = metricsData.reduce((sum, row) => sum + row.mttr_avg_min, 0) / metricsData.length;
-        if (mttrElement) mttrElement.innerHTML = `${avgMttr.toFixed(0)}<span style="font-size:16px">min</span>`;
+// ── UPDATE KPI CARDS ──
+function updateKPIs(rows) {
+  const availability = avg(rows, 'avg_availability_pct');
+  const incidents    = sum(rows, 'incidents_total');
+  const mttr         = avg(rows, 'mttr_avg_min');
+  const sloCompliant = avg(rows, 'slos_compliant');
+  const sloPct       = ((sloCompliant / 5) * 100).toFixed(1);
 
-        // SLO Compliance
-        const sloElement = healthCards[3].querySelector('.hc-value');
-        const avgSloCompliance = (avgCheckoutAvail + avgApiResponse + avgInventoryAvail + avgAuthSuccess) / 4 * 100;
-        if (sloElement) sloElement.textContent = `${avgSloCompliance.toFixed(1)}%`;
-      }
+  const cards = document.querySelectorAll('.health-card');
+  if (cards.length >= 4) {
+    cards[0].querySelector('.hc-value').textContent = availability.toFixed(2) + '%';
+    cards[0].querySelector('.hc-sub').textContent   =
+      availability >= 99.9 ? '✓ Above 99.9% target' :
+      availability >= 99.5 ? '↑ Good standing' : '⚠ Below target';
 
-      // Update SLO percentages (assuming order: checkout, api, inventory, auth, error)
-      const sloElements = document.querySelectorAll('.slo-pct');
-      const sloValues = [avgCheckoutAvail, avgApiResponse, avgInventoryAvail, avgAuthSuccess, avgErrorRate];
-      sloElements.forEach((el, index) => {
-        if (sloValues[index] !== undefined) {
-          el.textContent = `${(sloValues[index] * 100).toFixed(2)}%`;
-        }
-      });
+    cards[1].querySelector('.hc-value').textContent = incidents;
+    cards[1].querySelector('.hc-sub').textContent   =
+      `${sum(rows,'incidents_p1')} P1 · ${sum(rows,'incidents_p2')} P2 · ${sum(rows,'incidents_p3')} P3`;
 
-      // Update SLO fills
-      document.querySelectorAll('.slo-fill').forEach((fill, index) => {
-        if (sloValues[index] !== undefined) {
-          fill.style.width = `${sloValues[index] * 100}%`;
-          fill.dataset.w = sloValues[index] * 100;
-        }
-      });
+    cards[2].querySelector('.hc-value').innerHTML =
+      `${mttr.toFixed(0)}<span style="font-size:16px">min</span>`;
+    cards[2].querySelector('.hc-sub').textContent =
+      `MTTD avg: ${avg(rows,'mttd_avg_min').toFixed(1)} min`;
 
-      // Update period text
-      const periodTexts = {
-        'Q1': 'Jan 01 – Mar 31',
-        'Q2': 'Apr 01 – Jun 30',
-        'Q3': 'Jul 01 – Sep 30',
-        'Q4': 'Oct 01 – Dec 31'
-      };
-      const year = selectedQuarter.split(' ')[1];
-      const periodElement = document.getElementById('period-text-sre');
-      if (periodElement) {
-        periodElement.textContent = `${periodTexts[selectedQuarter.split(' ')[0]]}, ${year}`;
-      }
-
-      // Update nav current
-      const navCurrentElement = document.getElementById('nav-current-sre');
-      if (navCurrentElement) {
-        navCurrentElement.textContent = `SRE Metrics — ${selectedQuarter}`;
-      }
-
-      // Update document title
-      document.title = `SRE Command Center — ${selectedQuarter}`;
-
-      console.log(`SRE metrics updated for ${selectedQuarter}`);
-
-    } catch (error) {
-      console.error('Failed to load SRE metrics:', error);
-      // Fallback: show error message
-      const errorMsg = document.createElement('div');
-      errorMsg.style.cssText = 'position:fixed; top:20px; right:20px; background:#f85149; color:white; padding:10px; border-radius:4px; z-index:1000;';
-      errorMsg.textContent = `Error loading SRE data for ${selectedQuarter}. Using cached values.`;
-      document.body.appendChild(errorMsg);
-      setTimeout(() => errorMsg.remove(), 5000);
-    }
+    cards[3].querySelector('.hc-value').textContent = sloPct + '%';
+    cards[3].querySelector('.hc-sub').textContent   =
+      `${Math.round(sloCompliant)}/5 SLOs compliant avg`;
   }
+}
 
-  window.addEventListener('load', () => {
-    // Load initial data
-    loadAndUpdateSREMetrics().then(() => {
-      // Then animate bars
-      setTimeout(() => {
-        document.querySelectorAll('.bar-fill').forEach(bar => {
-          const w = parseFloat(bar.dataset.w);
-          bar.style.width = Math.max(0,((w-97)/3)*100) + '%';
-        });
-        document.querySelectorAll('.slo-fill').forEach(bar => {
-          bar.style.width = parseFloat(bar.dataset.w) + '%';
-        });
-      }, 300);
-    });
+// ── UPDATE SLOs ──
+function updateSLOs(rows) {
+  const targets = [99.5, 98.0, 99.0, 99.5, 99.5];
+  const keys    = [
+    'slo_checkout_avail_pct',
+    'slo_api_response_pct',
+    'slo_inventory_avail_pct',
+    'slo_auth_success_pct',
+    'slo_error_rate_pct'
+  ];
 
-    // Add event listener for quarter select
-    const quarterSelect = document.getElementById('quarter-select-sre');
-    if (quarterSelect) {
-      quarterSelect.addEventListener('change', (e) => {
-        loadAndUpdateSREMetrics(e.target.value).then(() => {
-          // Re-animate bars after data update
-          setTimeout(() => {
-            document.querySelectorAll('.bar-fill').forEach(bar => {
-              const w = parseFloat(bar.dataset.w);
-              bar.style.width = Math.max(0,((w-97)/3)*100) + '%';
-            });
-            document.querySelectorAll('.slo-fill').forEach(bar => {
-              bar.style.width = parseFloat(bar.dataset.w) + '%';
-            });
-          }, 300);
-        });
-      });
+  const sloPcts  = document.querySelectorAll('.slo-pct');
+  const sloFills = document.querySelectorAll('.slo-fill');
+  const sloSubs  = document.querySelectorAll('.slo-sub');
+
+  keys.forEach((key, i) => {
+    const val       = avg(rows, key);            // already a % value e.g. 99.87
+    const compliant = val >= targets[i];
+    const color     = compliant ? 'var(--green)' :
+                      val >= targets[i] - 0.5   ? 'var(--yellow)' : 'var(--red)';
+
+    if (sloPcts[i]) {
+      sloPcts[i].textContent = val.toFixed(2) + '%';
+      sloPcts[i].style.color = color;
+    }
+    if (sloFills[i]) {
+      sloFills[i].style.width      = Math.min(100, val) + '%';
+      sloFills[i].style.background = color;
+    }
+    if (sloSubs[i]) {
+      sloSubs[i].textContent =
+        `Target: ${targets[i]}% · ${compliant ? '✓ Compliant' : '⚠ Breached'}`;
     }
   });
-</script>
+}
+
+// ── UPDATE AVAILABILITY BARS ──
+function updateAvailBars(rows) {
+  const container = document.querySelector('.bar-chart');
+  if (!container) return;
+
+  const services = [
+    { key: 'avail_checkout_pct',    label: 'Checkout'     },
+    { key: 'avail_product_api_pct', label: 'Product API'  },
+    { key: 'avail_auth_service_pct',label: 'Auth Service' },
+    { key: 'avail_inventory_pct',   label: 'Inventory'    },
+    { key: 'avail_cdn_assets_pct',  label: 'CDN / Assets' },
+    { key: 'avail_notification_pct',label: 'Notification' }
+  ];
+
+  let html = '';
+  rows.forEach(row => {
+    html += `<div style="margin:12px 0 6px;font-family:var(--font-mono);font-size:10px;
+             color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;">
+             ${MONTH_NAMES[row.month]} ${row.year}</div>`;
+    services.forEach(svc => {
+      const val = parseFloat(row[svc.key]);
+      const pct = Math.max(0, ((val - 97) / 3) * 100);
+      const cls = val >= 99.9 ? 'green' : val >= 99.0 ? 'yellow' : 'red';
+      html += `
+        <div class="bar-row">
+          <span class="bar-label">${svc.label}</span>
+          <div class="bar-track">
+            <div class="bar-fill ${cls}" style="width:${pct.toFixed(1)}%"></div>
+          </div>
+          <span class="bar-val">${val.toFixed(2)}%</span>
+        </div>`;
+    });
+  });
+
+  container.innerHTML = html;
+}
+
+// ── UPDATE INCIDENTS TABLE ──
+function updateIncidentsTable(rows) {
+  const tbody = document.querySelector('tbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = rows.map(row => `
+    <tr>
+      <td style="color:var(--accent); font-family:var(--font-mono); font-size:12px">
+        ${MONTH_NAMES[row.month]} ${row.year}
+      </td>
+      <td>${row.incidents_total}</td>
+      <td><span class="sev-badge sev-p1">${row.incidents_p1} P1</span></td>
+      <td><span class="sev-badge sev-p2">${row.incidents_p2} P2</span></td>
+      <td><span class="sev-badge sev-p3">${row.incidents_p3} P3</span></td>
+      <td style="font-family:var(--font-mono); font-size:12px">
+        ${parseFloat(row.mttr_avg_min).toFixed(1)} min
+      </td>
+      <td style="font-family:var(--font-mono); font-size:12px; color:var(--text2)">
+        ${row.dora_level}
+      </td>
+    </tr>`).join('');
+}
+
+// ── UPDATE LABELS ──
+function updateLabels(quarterStr, rows) {
+  const [q, yr] = quarterStr.split(' ');
+
+  // subtitle
+  const sub = document.querySelector('.subtitle');
+  if (sub) sub.textContent = `// ${quarterStr} — Bogotá Regional Hub`;
+
+  // header period
+  const period = document.getElementById('period-text-sre');
+  if (period) period.textContent = `${PERIOD_LABELS[q]} ${yr}`;
+
+  // navbar breadcrumb
+  const nav = document.getElementById('nav-current-sre');
+  if (nav) nav.textContent = `SRE Metrics — ${quarterStr}`;
+
+  // page title
+  document.title = `SRE Command Center — ${quarterStr}`;
+}
+
+// ── MAIN RENDER ──
+async function loadAndUpdateSREMetrics(selectedQuarter = 'Q1 2026') {
+  try {
+    // 1. Load CSV via your csv-loader.js module
+    const data = await window.CSVLoader.loadMetrics(CSV_PATH);
+
+    // 2. Filter rows for selected quarter
+    const rows = data.filter(row => row.quarter === selectedQuarter);
+    if (rows.length === 0) throw new Error(`No data found for ${selectedQuarter}`);
+
+    // 3. Update all sections
+    updateLabels(selectedQuarter, rows);
+    updateKPIs(rows);
+    updateSLOs(rows);
+    updateAvailBars(rows);
+    updateIncidentsTable(rows);
+
+    console.log(`✅ SRE report updated: ${selectedQuarter} (${rows.length} months)`);
+
+  } catch (error) {
+    console.error('❌ Failed to load SRE metrics:', error);
+
+    // Show non-blocking toast error
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+      position:fixed; top:64px; right:20px; z-index:9999;
+      background:#1c2230; border:1px solid var(--red);
+      color:var(--red); padding:12px 16px; border-radius:6px;
+      font-family:var(--font-mono); font-size:11px; max-width:320px;`;
+    toast.textContent = `⚠ ${error.message} — showing static data`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+  }
+}
+
+// ── INIT ──
+window.addEventListener('load', () => {
+  // Load default quarter on page open
+  loadAndUpdateSREMetrics('Q1 2026');
+
+  // Wire up the quarter selector
+  const quarterSelect = document.getElementById('quarter-select-sre');
+  if (quarterSelect) {
+    quarterSelect.addEventListener('change', (e) => {
+      loadAndUpdateSREMetrics(e.target.value);
+    });
+  }
+});</script>
 </body>
 </html>
